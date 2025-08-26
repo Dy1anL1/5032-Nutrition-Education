@@ -60,7 +60,9 @@
 .main-nav a {
   text-decoration: none;
   color: #111827;
-  font-size: 14px;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
   padding: 6px 0;
 }
 
@@ -71,7 +73,8 @@
 
 .cta {
   text-decoration: none;
-  font-size: 14px;
+  font-size: 20px;
+  font-weight: 500;
   background: #111827;
   color: #fff;
   padding: 8px 14px;

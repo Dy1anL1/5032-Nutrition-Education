@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // import pages
-import Home from './pages/home.vue'
+import Home from './pages/Home.vue'
 import Recipes from './pages/Recipes.vue'
 import RecipeDetail from './pages/RecipeDetail.vue'
 import MealPlanner from './pages/MealPlanner.vue'

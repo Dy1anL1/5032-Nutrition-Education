@@ -41,11 +41,48 @@ const recipe = computed(() => data.find(r => r.id === id))
 </script>
 
 <style scoped>
-.wrap{max-width:900px;margin:0 auto;padding:16px}
-.hero{width:100%;height:260px;object-fit:cover;border-radius:12px;background:#f3f4f6;margin:10px 0}
-.tags{display:flex;gap:8px;flex-wrap:wrap;list-style:none;padding:0;margin:0}
-.tags li{background:#eef2ff;color:#3730a3;border-radius:999px;padding:2px 10px;font-size:12px}
-.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:8px 0 16px}
-.nutri{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;color:#374151}
-h1,h2{margin:8px 0}
+.wrap{
+  max-width:900px;
+  margin:0 auto;padding:16px
+}
+.hero{
+  width:100%;
+  height:260px;
+  object-fit:cover;
+  border-radius:12px;
+  background:#f3f4f6;
+  margin:10px 0
+}
+.tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  list-style:none;
+  padding:0;
+  margin:0
+}
+.tags li{
+  background:#eef2ff;
+  color:#3730a3;
+  border-radius:999px;
+  padding:2px 10px;
+  font-size:12px
+}
+.meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin:8px 0 16px
+}
+.nutri{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  font-size:14px;
+  color:#374151
+}
+h1,h2{
+  margin:8px 0
+}
 </style>
