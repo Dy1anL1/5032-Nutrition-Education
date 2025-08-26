@@ -12,7 +12,9 @@
       </div>
     </div>
 
-    <p class="muted" v-if="filtered.length === 0">No recipes found. Try another keyword or remove filters.</p>
+    <p class="muted" v-if="filtered.length === 0">
+      No recipes found. Try another keyword or remove filters.
+    </p>
 
     <div class="grid">
       <RecipeCard v-for="r in filtered" :key="r.id" :recipe="r" />
@@ -28,19 +30,18 @@ import { computed, ref } from 'vue'
 const q = ref('')
 const selectedTags = ref([])
 
-const allTags = [...new Set(data.flatMap(r => r.tags))]
+const allTags = [...new Set(data.flatMap((r) => r.tags))]
 
 const filtered = computed(() => {
   const text = q.value.trim().toLowerCase()
-  return data.filter(r => {
+  return data.filter((r) => {
     const textOk =
       !text ||
       r.title.toLowerCase().includes(text) ||
       r.ingredients.join(' ').toLowerCase().includes(text)
 
     const tagsOk =
-      selectedTags.value.length === 0 ||
-      selectedTags.value.every(t => r.tags.includes(t))
+      selectedTags.value.length === 0 || selectedTags.value.every((t) => r.tags.includes(t))
 
     return textOk && tagsOk
   })
@@ -48,72 +49,90 @@ const filtered = computed(() => {
 </script>
 
 <style scoped>
-.wrap{ 
-  max-width:1100px; 
-  margin:0 auto; 
-  padding:16px; 
-  background:#fff; 
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
 }
-.filters{
-  display:flex;
-  flex-direction:column;
-  gap:10px;margin:10px 0 16px
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0 16px;
 }
-.filters input{
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:12px 14px;
+.filters input {
+  padding: 10px 14px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
   outline: none;
+  font-size: 14px;
+  background: #fff;
+  color: #111827;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
-.filters input:focus{
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(22,163,74,.12);
+.filters input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
-input{
-  padding:10px;
-  border:1px solid #d1d5db;
-  border-radius:8px;
-  width:100%
+input {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 100%;
 }
-input{ 
-  background:#fff; 
-  color:var(--text); 
+input {
+  background: #fff;
+  color: var(--text);
 }
-.chips{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.chip{ 
-  background:#f9fafb; 
-  border:1px solid var(--border); 
+.chip {
+  background: #f9fafb;
+  border: 1px solid var(--border);
 }
-.chip{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:#f9fafb;
-  border:1px solid #e5e7eb;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:13px
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
 }
-.grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px
+.chip input[type='checkbox'] {
+  width: 30px;
+  height: 18px;
+  cursor: pointer;
 }
-@media (min-width:640px){
-  .grid{
-    grid-template-columns:repeat(2,1fr)
+
+.chip span {
+  font-size: 14px;
+  font-weight: 500;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (min-width:1024px){
-  .grid{
-    grid-template-columns:repeat(3,1fr)
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
-.muted{
-  color:#6b7280
+.muted {
+  color: #6b7280;
 }
 </style>
