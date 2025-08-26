@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "title": "Low-GI Pumpkin Soup",
+    "tags": ["low-gi", "vegetarian", "budget"],
+    "short": "Creamy, warming soup with low glycemic impact.",
+    "ingredients": ["pumpkin", "onion", "vegetable stock", "olive oil", "pepper", "salt"],
+    "steps": ["Dice pumpkin and onion.", "Sauté onion in oil.", "Add pumpkin + stock and simmer 15-20 min.", "Blend until smooth; season to taste."],
+    "nutrition": { "kcal": 180, "carbs": 22, "protein": 4, "fat": 7 },
+    "image": "/images/pumpkin.png"
+  },
+  {
+    "id": 2,
+    "title": "Budget Chickpea Salad",
+    "tags": ["budget", "high-protein", "vegan"],
+    "short": "Pantry-friendly salad rich in plant protein.",
+    "ingredients": ["canned chickpeas", "cucumber", "tomatoes", "lemon", "parsley", "olive oil"],
+    "steps": ["Rinse chickpeas.", "Chop veg.", "Dress with lemon, oil, salt."],
+    "nutrition": { "kcal": 320, "carbs": 36, "protein": 14, "fat": 12 },
+    "image": "/images/chickpea.png"
+  },
+  {
+    "id": 3,
+    "title": "Oat & Berry Breakfast",
+    "tags": ["breakfast", "low-gi", "vegetarian"],
+    "short": "5-minute oats with fibre and antioxidants.",
+    "ingredients": ["rolled oats", "milk or soy", "berries", "chia seeds"],
+    "steps": ["Cook oats.", "Top with berries and chia."],
+    "nutrition": { "kcal": 280, "carbs": 40, "protein": 10, "fat": 8 },
+    "image": "/images/oats.png"
+  },
+  {
+    "id": 4,
+    "title": "Stir-fried Veg & Tofu",
+    "tags": ["high-protein", "vegetarian", "budget"],
+    "short": "Quick wok dinner with tofu and greens.",
+    "ingredients": ["firm tofu", "mixed vegetables", "soy sauce", "garlic"],
+    "steps": ["Press tofu & cube.", "Stir-fry veg then tofu.", "Add soy; toss."],
+    "nutrition": { "kcal": 350, "carbs": 20, "protein": 22, "fat": 18 },
+    "image": "/images/tofu.png"
+  },
+  {
+    "id": 5,
+    "title": "Baked Salmon & Greens",
+    "tags": ["heart-health", "high-protein"],
+    "short": "Omega-3 rich tray bake with broccoli.",
+    "ingredients": ["salmon fillet", "broccoli", "olive oil", "lemon"],
+    "steps": ["Season salmon & veg.", "Bake 12-15 min at 200°C."],
+    "nutrition": { "kcal": 420, "carbs": 8, "protein": 35, "fat": 26 },
+    "image": "/images/salmon.png"
+  }
+]
