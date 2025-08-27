@@ -130,3 +130,9 @@ textarea:focus {
 .hero p {
   color: var(--muted);
 }
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 16px;
+}
