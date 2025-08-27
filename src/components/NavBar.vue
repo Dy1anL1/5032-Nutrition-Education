@@ -14,7 +14,7 @@
             />
           </svg>
         </span>
-        NutriWell
+        Healthy Living
       </router-link>
 
       <nav class="nav-links">
@@ -31,7 +31,7 @@
         <router-link to="/register" class="btn-signup">Sign Up</router-link>
         <RouterLink to="/account" class="avatar" aria-label="Account">
           <svg
-            viewBox="0 0 24 24"
+            viewBox="0 0 20 20"
             width="22"
             height="22"
             fill="none"
@@ -92,12 +92,12 @@
 .nav-links {
   justify-self: center;
   display: flex;
-  gap: 36px;
+  gap: 80px;
   align-items: center;
 }
 .nav-links a {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--muted);
   padding: 6px 2px;
   position: relative;
@@ -108,7 +108,7 @@
   color: var(--ink);
 }
 .nav-links .active {
-  color: var(--green);
+  color: var(--green) !important;
 }
 .nav-links .active::after {
   content: '';
@@ -131,7 +131,7 @@
 .login {
   color: var(--ink);
   font-weight: 600;
-  font-size: 17px;
+  font-size: 19px;
   background: none;
   border: none;
   padding: 0 8px;
@@ -150,7 +150,7 @@
   padding: 10px 18px;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 19px;
   background: #22c55e !important;
   color: #fff !important;
   border: none !important;
@@ -164,7 +164,7 @@
 }
 
 .avatar {
-  margin-left: 8px;
+  margin-left: 50px;
   opacity: 0.8;
   display: flex;
   align-items: center;
