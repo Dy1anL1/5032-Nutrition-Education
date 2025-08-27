@@ -11,6 +11,8 @@
           <router-link to="/meal-planner">Meal Planner</router-link>
           <router-link to="/nutrition-education">Nutrition Education</router-link>
           <router-link to="/about">About</router-link>
+          <router-link to="/contact">Contact</router-link>
+          <router-link to="/my-account">My Account</router-link>
         </nav>
 
         <router-link to="/login" class="cta">Login/Register</router-link>
@@ -34,13 +36,14 @@
 }
 
 .nav-row {
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 1250px;
+  margin: 0;
   padding: 0 16px;
-  height: 56px;
+  height: 70px;
   display: flex;
   align-items: center;
   gap: 16px;
+  justify-content: space-between;
 }
 
 .brand {
@@ -53,8 +56,8 @@
 
 .main-nav {
   display: flex;
-  gap: 24px;
-  margin: 0 auto;
+  gap: 28px;
+  margin: 0;
 }
 
 .main-nav a {

@@ -2,7 +2,6 @@
   <section class="container">
     <div class="form-center">
       <div class="form-block">
-
         <h1>Register</h1>
 
         <!-- Success/Error Message -->
@@ -59,7 +58,9 @@
               @blur="() => validateConfirm(true)"
               @input="() => validateConfirm(false)"
             />
-            <div v-if="errors.confirmPassword" class="text-danger">{{ errors.confirmPassword }}</div>
+            <div v-if="errors.confirmPassword" class="text-danger">
+              {{ errors.confirmPassword }}
+            </div>
           </div>
 
           <div class="form-actions">
@@ -67,7 +68,6 @@
             <router-link to="/login" class="btn">Back to Login</router-link>
           </div>
         </form>
-
       </div>
     </div>
   </section>
@@ -83,14 +83,14 @@ const form = ref({
   name: '',
   email: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
 })
 
 const errors = ref({
   name: null,
   email: null,
   password: null,
-  confirmPassword: null
+  confirmPassword: null,
 })
 
 const successMsg = ref('')
@@ -170,28 +170,28 @@ const submitForm = () => {
 </script>
 
 <style scoped>
-.form-center { 
-  display:flex; 
-  justify-content:center; 
+.form-center {
+  display: flex;
+  justify-content: center;
 }
-.text-danger { 
-  color:#dc2626; 
-  font-size: 13px; 
+.text-danger {
+  color: #dc2626;
+  font-size: 13px;
 }
-.alert { 
-  padding:10px 12px; 
-  border-radius:8px; 
-  margin:10px 0; 
-  font-size:14px; 
+.alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 14px;
 }
-.alert.success { 
-  background:#ecfdf5; 
-  color:#065f46; 
-  border:1px solid #a7f3d0; 
+.alert.success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
-.alert.error { 
-  background:#fef2f2; 
-  color:#991b1b; 
-  border:1px solid #fecaca; 
+.alert.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 </style>
