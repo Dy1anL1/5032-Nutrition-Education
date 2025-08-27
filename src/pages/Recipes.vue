@@ -1,138 +1,44 @@
 <template>
-  <section class="wrap">
-    <h1>Healthy Recipes</h1>
+  <SectionTitle title="Healthy Recipes" subtitle="Search and filter by dietary needs" />
 
-    <div class="filters">
-      <input v-model="q" placeholder="Search by name or ingredient..." />
-      <div class="chips">
-        <label v-for="t in allTags" :key="t" class="chip">
-          <input type="checkbox" :value="t" v-model="selectedTags" />
-          <span>#{{ t }}</span>
-        </label>
+  <div class="grid" style="grid-template-columns: 280px 1fr">
+    <aside class="card" style="padding: 14px">
+      <label class="kbd">Search</label>
+      <input v-model="q" class="input" placeholder="pumpkin, low-gi..." />
+      <div style="margin-top: 16px">
+        <p class="kbd">Filter by tag</p>
+        <label><input type="checkbox" value="low-gi" v-model="tags" /> Low-GI</label><br />
+        <label><input type="checkbox" value="vegetarian" v-model="tags" /> Vegetarian</label><br />
+        <label><input type="checkbox" value="budget" v-model="tags" /> Budget</label><br />
+        <label><input type="checkbox" value="quick" v-model="tags" /> Quick</label>
       </div>
-    </div>
+      <p style="margin-top: 10px; color: var(--muted)">Results: {{ filtered.length }}</p>
+    </aside>
 
-    <p class="muted" v-if="filtered.length === 0">
-      No recipes found. Try another keyword or remove filters.
-    </p>
-
-    <div class="grid">
+    <div class="cards">
       <RecipeCard v-for="r in filtered" :key="r.id" :recipe="r" />
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+import SectionTitle from '../components/SectionTitle.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import data from '../data/recipes.json'
-import { computed, ref } from 'vue'
 
 const q = ref('')
-const selectedTags = ref([])
-
-const allTags = [...new Set(data.flatMap((r) => r.tags))]
+const tags = ref([])
 
 const filtered = computed(() => {
-  const text = q.value.trim().toLowerCase()
+  const kw = q.value.trim().toLowerCase()
   return data.filter((r) => {
-    const textOk =
-      !text ||
-      r.title.toLowerCase().includes(text) ||
-      r.ingredients.join(' ').toLowerCase().includes(text)
-
-    const tagsOk =
-      selectedTags.value.length === 0 || selectedTags.value.every((t) => r.tags.includes(t))
-
-    return textOk && tagsOk
+    const kwOk =
+      !kw ||
+      r.title.toLowerCase().includes(kw) ||
+      r.ingredients.join(' ').toLowerCase().includes(kw)
+    const tagOk = tags.value.length === 0 || tags.value.every((t) => r.tags.includes(t))
+    return kwOk && tagOk
   })
 })
 </script>
-
-<style scoped>
-.wrap {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 16px;
-  background: #fff;
-}
-.filters {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 10px 0 16px;
-}
-.filters input {
-  padding: 10px 14px;
-  border: 2px solid #d1d5db;
-  border-radius: 8px;
-  outline: none;
-  font-size: 14px;
-  background: #fff;
-  color: #111827;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-.filters input:focus {
-  border-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
-}
-input {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  width: 100%;
-}
-input {
-  background: #fff;
-  color: var(--text);
-}
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.chip {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-}
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.chip input[type='checkbox'] {
-  width: 30px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.chip span {
-  font-size: 14px;
-  font-weight: 500;
-}
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-@media (min-width: 640px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-.muted {
-  color: #6b7280;
-}
-</style>
