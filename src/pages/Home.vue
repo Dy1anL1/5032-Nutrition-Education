@@ -4,8 +4,8 @@
     <p>Trusted recipes, practical meal planning, and easy-to-read nutrition guides.</p>
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
       <router-link to="/recipes" class="btn primary">Browse Recipes</router-link>
-      <router-link to="/meal-planner" class="btn">Open Meal Planner</router-link>
-      <router-link to="/education" class="btn">Nutrition Education</router-link>
+      <router-link to="/meal-planner" class="btn primary">Open Meal Planner</router-link>
+      <router-link to="/education" class="btn primary">Nutrition Education</router-link>
     </div>
   </section>
 

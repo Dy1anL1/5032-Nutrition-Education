@@ -49,7 +49,7 @@ nav .links a.active {
 }
 .btn.primary {
   background: var(--brand);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--brand);
 }
 .btn.block {
