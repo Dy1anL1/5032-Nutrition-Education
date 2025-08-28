@@ -117,8 +117,11 @@ const filtered = computed(() => {
 
 /* ========= Title Bar ========= */
 .title-bar {
+  /* full-bleed visual while staying flush under the nav */
   width: 100vw;
-  height: 9vw;
+  height: 12vw;
+  margin: 20px; /* remove any top/bottom gap so title-bar touches NavBar */
+  margin-top: -25px; /* cover the 1px border line from the nav header */
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   background: linear-gradient(90deg, #e9f9ec 0%, #fff4eb 100%);
@@ -132,7 +135,7 @@ const filtered = computed(() => {
 }
 .title {
   font-size: 48px;
-  line-height: 1.5;
+  line-height: 2.5;
   margin: 0 0 12px;
   font-weight: 800;
   color: #1b1b1b;
@@ -146,8 +149,9 @@ const filtered = computed(() => {
 
 /* ========= Filter Bar ========= */
 .filters-wrap {
-  /* Center the filter bar and make it occupy ~80% of the page width (but don't exceed page max) */
-  width: min(80%, var(--page-max));
+  /* Center the filter bar and make it occupy 100% of the page width (constrained by page max) */
+  width: 100%;
+  max-width: var(--page-max);
   margin: 0 auto;
   padding-inline: var(--pad-inline-filters);
   box-sizing: border-box;

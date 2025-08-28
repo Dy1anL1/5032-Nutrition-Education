@@ -47,8 +47,6 @@
 .topbar {
   background: #fff;
   border-bottom: 1px solid var(--line);
-  margin: 0; /* remove default margins that could create gap */
-  padding: 0; /* ensure no extra padding on the wrapper */
 }
 
 .navbar {
