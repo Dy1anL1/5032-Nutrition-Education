@@ -86,6 +86,19 @@ npm run dev
 
 Open the app in your browser (usually http://localhost:5173). If you add PrimeVue, ensure its CSS imports are added to `src/main.js` as shown above.
 
+## Development test account
+
+For convenience during development there is an in-app test account you can use to sign in on the Login page. This is a client-side mock only - remove or change it before deploying.
+
+Credentials (development only):
+
+```
+Email: 123@example.com
+Password: Pass123!
+```
+
+Note: the login form currently pre-fills the email field with the test account. Authentication is mocked on the client and does not represent secure, server-side auth.
+
 
 ## Next steps
 
