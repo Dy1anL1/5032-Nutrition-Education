@@ -1,5 +1,11 @@
 <template>
-  <SectionTitle title="Contact" subtitle="Send us a message" />
+  <section class="title-bar">
+    <div class="title-inner">
+      <h1 class="title">Contact Us</h1>
+      <p class="subtitle">Send us a message - we'll get back to you (mock).</p>
+    </div>
+  </section>
+
   <form @submit.prevent="onSubmit" class="grid" style="max-width: 520px">
     <label>Name</label>
     <input v-model.trim="name" class="input" />

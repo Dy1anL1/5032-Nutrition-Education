@@ -16,6 +16,37 @@ header {
   z-index: 10;
 }
 
+/* Global title bar used by multiple pages (matches Recipes.vue look) */
+.title-bar {
+  width: 100vw;
+  height: 12vw;
+  margin: 20px;
+  margin-top: -25px; /* visually sit under the nav */
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: linear-gradient(90deg, #e9f9ec 0%, #fff4eb 100%);
+  border-bottom: 1px solid var(--line);
+}
+.title-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 56px 24px;
+  text-align: center;
+}
+.title {
+  font-size: 48px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+  font-weight: 800;
+  color: #1b1b1b;
+}
+.subtitle {
+  max-width: 900px;
+  margin: 0 auto;
+  color: #5a6676;
+  font-size: 18px;
+}
+
 nav .brand {
   font-weight: 700;
   color: var(--brand);
@@ -87,7 +118,7 @@ textarea:focus {
 /* Cards */
 .cards {
   display: grid;
-  gap: 16px;
+  gap: 24px; /* increased spacing between cards */
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 @media (min-width: 640px) {

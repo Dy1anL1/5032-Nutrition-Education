@@ -1,7 +1,13 @@
 <template>
+  <!-- Page title bar (consistent with Recipes) -->
+  <section class="title-bar">
+    <div class="title-inner">
+      <h1 class="title">Welcome to Healthy Living</h1>
+      <p class="subtitle">Trusted recipes, practical meal planning, and easy-to-read nutrition guides.</p>
+    </div>
+  </section>
+
   <section class="hero">
-    <h1>Public health through nutrition education</h1>
-    <p>Trusted recipes, practical meal planning, and easy-to-read nutrition guides.</p>
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
       <router-link to="/recipes" class="btn primary">Browse Recipes</router-link>
       <router-link to="/meal-planner" class="btn primary">Open Meal Planner</router-link>
@@ -10,7 +16,6 @@
   </section>
 
   <section>
-    <SectionTitle title="Featured recipes" subtitle="Healthy choices to get started" />
     <div class="cards">
       <RecipeCard v-for="r in featured" :key="r.id" :recipe="r" />
     </div>

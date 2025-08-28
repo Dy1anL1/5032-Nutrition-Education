@@ -1,5 +1,11 @@
 <template>
-  <SectionTitle title="Nutrition Education" subtitle="Articles, infographics and quick guides" />
+  <section class="title-bar">
+    <div class="title-inner">
+      <h1 class="title">Nutrition Education</h1>
+      <p class="subtitle">Articles, infographics and quick guides to build healthy habits.</p>
+    </div>
+  </section>
+
   <div class="cards">
     <article class="card">
       <div class="body">

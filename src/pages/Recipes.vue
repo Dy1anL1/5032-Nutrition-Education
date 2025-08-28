@@ -252,7 +252,7 @@ const filtered = computed(() => {
   max-width: var(--page-max);
   margin: 0 auto;
   padding-inline: var(--pad-inline-grid);
-  padding-bottom: 28px;
+  padding-bottom: 40px;
 }
 
 /* Responsive: stack on small screens */
