@@ -1,3 +1,8 @@
+<!--
+  FooterBar
+  - Static site footer component with brand, contact details and helpful links.
+  - Update addresses, contact emails and support links here. No runtime script is required.
+-->
 <template>
   <footer class="footer">
     <div class="container grid footer-top">
@@ -76,7 +81,8 @@
 </template>
 
 <script setup>
-/* no script needed */
+// FooterBar - static footer content. Keep any dynamic behaviour minimal and add scripts
+// only when interactive features (e.g. newsletter signup) are required.
 </script>
 
 <style scoped>

@@ -1,3 +1,9 @@
+<!--
+  Register page
+  - Simple client-side form demonstrating validation and a session-only preview card.
+  - Fields: name, email, password, confirm. Validation runs on blur and on submit.
+  - After successful submit a snapshot is shown (preview card). Passwords are masked by default.
+-->
 <template>
   <SectionTitle title="Register" subtitle="Create an account to save your plans" />
 
@@ -76,17 +82,21 @@
 import { ref, computed } from 'vue'
 import SectionTitle from '../components/SectionTitle.vue'
 
+// form model
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirm = ref('')
-const ok = ref(false)
-const showInfo = ref(false)
-const reveal = ref(false)
 
-// Snapshot for info card (prevents user edits from affecting displayed info)
+// UI state
+const ok = ref(false)
+const showInfo = ref(false) // whether the preview card is visible
+const reveal = ref(false) // toggle to show password in the preview
+
+// Snapshot for the preview card - keeps displayed values stable after submit
 const snapshot = ref({ name: '', email: '', password: '' })
 
+// Simple validation errors object
 const errors = ref({
   name: null,
   email: null,
@@ -94,6 +104,7 @@ const errors = ref({
   confirm: null,
 })
 
+// Validation helpers - validate on blur and also during submit
 function validateName(blur) {
   if (name.value.length < 3) {
     if (blur) errors.value.name = 'Name must be at least 3 characters'
@@ -126,6 +137,7 @@ function validateConfirm(blur) {
   }
 }
 
+// Masked password for the preview card
 const maskedPassword = computed(() => '\u2022'.repeat(Math.max(8, password.value.length || 8)))
 
 function onSubmit() {

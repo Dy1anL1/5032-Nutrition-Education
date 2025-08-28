@@ -1,3 +1,8 @@
+<!--
+  About page
+  - Short mission statement for the Healthy Living project. Expand with team,
+    partners, or timeline sections as content becomes available.
+-->
 <template>
   <section class="title-bar">
     <div class="title-inner">
@@ -13,4 +18,7 @@
 </template>
 <script setup>
 import SectionTitle from '../components/SectionTitle.vue'
+
+// About page is intentionally simple in V1. When adding richer content consider
+// splitting team/partners into separate components or data-driven lists.
 </script>

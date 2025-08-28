@@ -1,3 +1,9 @@
+<!--
+  Contact page
+  - Small contact form used as a mock for demo purposes.
+  - Basic client-side validation: name required, valid email, and message length >= 10.
+  - Replace with server-side submission when integrating a backend.
+-->
 <template>
   <section class="title-bar">
     <div class="title-inner">
@@ -28,6 +34,9 @@ const name = ref(''),
   msg = ref('')
 const ok = ref(false),
   err = ref('')
+
+// Simple submit handler with basic validation. Keep this client-side check as
+// a UX convenience; submissions should be posted to a server endpoint in real apps.
 function onSubmit() {
   ok.value = false
   err.value = ''

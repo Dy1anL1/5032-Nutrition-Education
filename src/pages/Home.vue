@@ -1,3 +1,9 @@
+<!--
+  Home page
+  - Landing page with three quick-action tiles and a featured recipes strip.
+  - Uses `RecipeCard` to render the first few entries from the local recipes JSON.
+  - Keep this page lightweight; move data and routing logic to dedicated stores/pages as needed.
+-->
 <template>
   <!-- Page title bar (consistent with Recipes) -->
   <section class="title-bar">
@@ -51,8 +57,12 @@
 </template>
 
 <script setup>
+// Home page
+// Shows three highlight tiles and a few featured recipe cards.
 import RecipeCard from '../components/RecipeCard.vue'
 import recipes from '../data/recipes.json'
+
+// Featured subset used for the cards on the home page (first three entries)
 const featured = recipes.slice(0, 3)
 </script>
 

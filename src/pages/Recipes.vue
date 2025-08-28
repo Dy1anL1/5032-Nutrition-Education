@@ -1,3 +1,9 @@
+<!--
+  Recipes page
+  - Shows a searchable, filterable list of recipes loaded from local JSON.
+  - Controls: search box (q), category select, diet select.
+  - The `filtered` computed returns the visible recipes based on those controls.
+-->
 <template>
   <!-- Full-width title bar -->
   <section class="title-bar">
@@ -64,15 +70,21 @@
 </template>
 
 <script setup>
+// Local state used for filtering
 import { ref, computed } from 'vue'
 import SectionTitle from '../components/SectionTitle.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import data from '../data/recipes.json'
 
+// Query string for free-text search (matches title and ingredients)
 const q = ref('')
+
+// Category and diet selectors - match against recipe fields and tags
 const category = ref('')
 const diet = ref('')
 
+// `filtered` - computed list derived from the data file and the three controls above.
+// Keeps filtering logic local and easy to test.
 const filtered = computed(() => {
   const kw = q.value.trim().toLowerCase()
   return data.filter((r) => {

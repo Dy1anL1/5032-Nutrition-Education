@@ -1,3 +1,6 @@
+// Router setup
+// Maps application pages to routes. Keep routes simple - each page is a component
+// imported from the `pages/` folder.
 import { createRouter, createWebHistory } from 'vue-router'
 
 // Pages
@@ -15,6 +18,7 @@ import Account from './pages/Account.vue'
 const routes = [
   { path: '/', component: Home },
   { path: '/recipes', component: Recipes },
+  // recipe detail accepts an `id` param (e.g. /recipes/2)
   { path: '/recipes/:id', component: RecipeDetail, props: true },
   { path: '/meal-planner', component: MealPlanner },
   { path: '/education', component: Education },
@@ -28,6 +32,7 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  // Always scroll to top on navigation to avoid awkward scroll positions
   scrollBehavior() {
     return { top: 0 }
   },

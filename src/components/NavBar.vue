@@ -1,3 +1,9 @@
+<!--
+  NavBar
+  - Top-level site navigation. Uses <router-link> for client-side routing.
+  - Responsive behaviour: center links are hidden on small viewports; actions remain visible.
+  - To add a mobile menu, implement a toggle and show/hide the `.nav-links` block.
+-->
 <template>
   <header class="topbar">
     <div class="navbar">
@@ -33,7 +39,10 @@
   </header>
 </template>
 
-<script setup></script>
+<script setup>
+// NavBar is intentionally presentation-first. Add JS here only if you implement
+// a mobile menu toggle or other interactive behaviour.
+</script>
 
 <style scoped>
 :root {

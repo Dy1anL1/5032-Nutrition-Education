@@ -1,3 +1,10 @@
+<!--
+  RecipeCard
+  - Presentational component that shows a single recipe tile.
+  - Props:
+    - recipe: object (required) - the recipe data used to render title, image, summary and nutrition.
+  - Clicking the CTA navigates to the recipe detail page.
+-->
 <template>
   <article class="rc-card">
     <div
@@ -24,6 +31,8 @@
 </template>
 
 <script setup>
+// Props
+// `recipe` is expected to contain fields like id, title, image, summary and nutrition.
 defineProps({ recipe: { type: Object, required: true } })
 </script>
 

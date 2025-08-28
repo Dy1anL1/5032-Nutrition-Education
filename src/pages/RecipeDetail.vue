@@ -1,3 +1,9 @@
+<!--
+  Recipe detail modal
+  - Opens as a centered overlay. Shows title, image, tags and nutrition on the left,
+    and Ingredients + Instructions on the right.
+  - The close() helper uses router.back() when possible; otherwise it navigates to /recipes.
+-->
 <template>
   <div>
     <div v-if="recipe" class="rd-overlay" @click.self="close">
@@ -87,10 +93,12 @@ import data from '../data/recipes.json'
 
 const route = useRoute()
 const router = useRouter()
+
+// Find the recipe by id from the local JSON. Using a computed keeps the template reactive.
 const recipe = computed(() => data.find((r) => String(r.id) === route.params.id))
 
+// Close the modal: prefer history.back() so the user's navigation is preserved.
 function close() {
-  // navigate back; if no history, go to recipes
   if (window.history.length > 1) router.back()
   else router.push('/recipes')
 }
