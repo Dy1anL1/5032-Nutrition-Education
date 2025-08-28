@@ -1,29 +1,15 @@
 <template>
   <header class="topbar">
     <div class="navbar">
-      <router-link class="brand" to="/">
-        <span class="logo-icon">
-          <svg width="32" height="32" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="16" fill="#22c55e" />
-            <path d="M10 17c2 4 10 4 12-2" stroke="#fff" stroke-width="2" fill="none" />
-            <path
-              d="M16 11a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"
-              stroke="#fff"
-              stroke-width="2"
-              fill="none"
-            />
-          </svg>
-        </span>
-        Healthy Living
-      </router-link>
+      <router-link class="brand" to="/"> Healthy Living </router-link>
 
       <nav class="nav-links">
-        <router-link to="/" exact-active-class="active">Home</router-link>
-        <router-link to="/recipes" active-class="active">Recipes</router-link>
-        <router-link to="/meal-planner" active-class="active">Meal Planner</router-link>
-        <router-link to="/education" active-class="active">Education</router-link>
-        <router-link to="/about" active-class="active">About</router-link>
-        <router-link to="/contact" active-class="active">Contact</router-link>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/recipes">Recipes</RouterLink>
+        <RouterLink to="/meal-planner">Meal Planner</RouterLink>
+        <RouterLink to="/education">Education</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/contact">Contact</RouterLink>
       </nav>
 
       <div class="actions">
@@ -92,33 +78,17 @@
 .nav-links {
   justify-self: center;
   display: flex;
-  gap: 80px;
+  gap: 48px;
   align-items: center;
 }
-.nav-links a {
+.nav-links :deep(a) {
   font-weight: 600;
   font-size: 20px;
   color: var(--muted);
   padding: 6px 2px;
   position: relative;
   text-decoration: none;
-  transition: color 0.2s;
-}
-.nav-links a:hover {
-  color: var(--ink);
-}
-.nav-links .active {
-  color: var(--green) !important;
-}
-.nav-links .active::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--green);
+  transition: color 0.18s ease;
 }
 
 .actions {

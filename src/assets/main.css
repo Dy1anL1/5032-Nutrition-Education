@@ -152,3 +152,46 @@ form.grid {
     padding: 12px 4px;
   }
 }
+
+.nav-links a {
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--muted);
+  padding: 6px 2px;
+  position: relative;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.nav-links a:hover {
+  color: var(--ink);
+}
+
+/* underline bar */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--green);
+  transform-origin: center;
+  transform: scaleX(0);
+  opacity: 0;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease;
+}
+
+/* Vue Router built-in active classes */
+.navbar .nav-links a.router-link-active,
+.navbar .nav-links a.router-link-exact-active {
+  color: var(--green) !important;
+  font-weight: 700;
+}
+.navbar .nav-links a.router-link-active::after,
+.navbar .nav-links a.router-link-exact-active::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
