@@ -22,5 +22,107 @@
     "ingredients": ["broccoli", "carrot", "capsicum", "soy sauce", "garlic"],
     "steps": ["Chop veggies", "Stir-fry on high heat", "Season and serve over rice"],
     "nutrition": { "kcal": 320, "carbs": 48, "protein": 9, "fat": 10 }
+  },
+  {
+    "id": 3,
+    "title": "Greek Yogurt Parfait",
+    "tags": ["breakfast", "protein", "quick"],
+    "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=800&auto=format&fit=crop",
+    "summary": "Layered Greek yogurt with fresh fruit and granola; great protein boost.",
+    "ingredients": ["Greek yogurt", "mixed berries", "honey", "granola"],
+    "steps": ["Layer yogurt, fruit and granola", "Drizzle with honey and serve"],
+    "nutrition": { "kcal": 280, "carbs": 34, "protein": 18, "fat": 7 }
+  },
+  {
+    "id": 4,
+    "title": "Baked Salmon with Herbed Couscous",
+    "tags": ["dinner", "healthy", "omega-3"],
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop",
+    "summary": "Simple baked salmon paired with light herbed couscous.",
+    "ingredients": ["salmon fillet", "couscous", "parsley", "lemon", "olive oil", "salt", "pepper"],
+    "steps": [
+      "Season and bake salmon",
+      "Prepare couscous and mix with herbs",
+      "Plate and serve with lemon"
+    ],
+    "nutrition": { "kcal": 560, "carbs": 34, "protein": 36, "fat": 28 }
+  },
+  {
+    "id": 5,
+    "title": "Chickpea Coconut Curry",
+    "tags": ["vegan", "gluten-free", "budget"],
+    "image": "https://images.unsplash.com/photo-1543353071-087092ec3930?q=80&w=800&auto=format&fit=crop",
+    "summary": "Creamy, spiced curry made with chickpeas and coconut milk.",
+    "ingredients": ["chickpeas", "onion", "garlic", "coconut milk", "curry powder", "tomato"],
+    "steps": [
+      "Sauté aromatics",
+      "Add spices and tomatoes",
+      "Stir in chickpeas and coconut milk, simmer"
+    ],
+    "nutrition": { "kcal": 430, "carbs": 52, "protein": 14, "fat": 18 }
+  },
+  {
+    "id": 6,
+    "title": "Quinoa & Roasted Veg Bowl",
+    "tags": ["vegetarian", "gluten-free", "budget"],
+    "image": "https://images.unsplash.com/photo-1523986371872-9d3ba2e2f642?q=80&w=800&auto=format&fit=crop",
+    "summary": "Hearty quinoa bowl with seasonal roasted vegetables and lemon-tahini dressing.",
+    "ingredients": ["quinoa", "zucchini", "eggplant", "tomato", "olive oil", "tahini", "lemon"],
+    "steps": ["Cook quinoa", "Roast vegetables until tender", "Toss with dressing and serve"],
+    "nutrition": { "kcal": 420, "carbs": 56, "protein": 12, "fat": 14 }
+  },
+  {
+    "id": 7,
+    "title": "Overnight Oats with Banana",
+    "tags": ["breakfast", "vegetarian", "quick"],
+    "image": "https://images.unsplash.com/photo-1516100882582-96c3a05fe590?q=80&w=800&auto=format&fit=crop",
+    "summary": "Easy overnight oats sweetened with banana and a touch of cinnamon.",
+    "ingredients": ["rolled oats", "milk (or plant milk)", "banana", "chia seeds", "cinnamon"],
+    "steps": ["Mix ingredients in jar", "Refrigerate overnight", "Top with fresh banana and serve"],
+    "nutrition": { "kcal": 350, "carbs": 56, "protein": 10, "fat": 8 }
+  },
+  {
+    "id": 8,
+    "title": "Grilled Chicken Wrap",
+    "tags": ["lunch", "quick", "protein"],
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop",
+    "summary": "Whole-grain wrap filled with grilled chicken, salad and light yogurt sauce.",
+    "ingredients": ["whole-grain wrap", "grilled chicken", "lettuce", "tomato", "yogurt sauce"],
+    "steps": ["Grill chicken and slice", "Assemble ingredients in wrap", "Fold and serve"],
+    "nutrition": { "kcal": 460, "carbs": 44, "protein": 32, "fat": 14 }
+  },
+  {
+    "id": 9,
+    "title": "Lentil & Tomato Soup",
+    "tags": ["vegetarian", "budget", "low-fat"],
+    "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop",
+    "summary": "Comforting lentil soup packed with fibre and iron.",
+    "ingredients": ["red lentils", "tomato", "carrot", "celery", "vegetable stock", "spices"],
+    "steps": [
+      "Sauté vegetables",
+      "Add lentils and stock, simmer until tender",
+      "Blend slightly for creaminess or leave chunky"
+    ],
+    "nutrition": { "kcal": 300, "carbs": 48, "protein": 18, "fat": 4 }
+  },
+  {
+    "id": 10,
+    "title": "Green Smoothie Bowl",
+    "tags": ["breakfast", "vegan", "quick"],
+    "image": "https://images.unsplash.com/photo-1505575975782-5f99a5ff3f3f?q=80&w=800&auto=format&fit=crop",
+    "summary": "Vibrant smoothie bowl with spinach, banana and nut toppings.",
+    "ingredients": ["spinach", "banana", "frozen mango", "almond milk", "toppings (nuts, seeds)"],
+    "steps": ["Blend base until thick and smooth", "Pour into bowl and add toppings"],
+    "nutrition": { "kcal": 310, "carbs": 56, "protein": 6, "fat": 9 }
+  },
+  {
+    "id": 11,
+    "title": "Roasted Cauliflower Tacos",
+    "tags": ["snacks", "vegetarian", "quick"],
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop",
+    "summary": "Spiced roasted cauliflower served in corn tortillas with slaw.",
+    "ingredients": ["cauliflower", "tortillas", "cabbage slaw", "lime", "spices"],
+    "steps": ["Roast spiced cauliflower", "Warm tortillas and assemble tacos with slaw and lime"],
+    "nutrition": { "kcal": 390, "carbs": 50, "protein": 8, "fat": 14 }
   }
 ]

@@ -47,6 +47,8 @@
 .topbar {
   background: #fff;
   border-bottom: 1px solid var(--line);
+  margin: 0; /* remove default margins that could create gap */
+  padding: 0; /* ensure no extra padding on the wrapper */
 }
 
 .navbar {
@@ -83,7 +85,7 @@
 }
 .nav-links :deep(a) {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 19px;
   color: var(--muted);
   padding: 6px 2px;
   position: relative;
@@ -101,7 +103,7 @@
 .login {
   color: var(--ink);
   font-weight: 600;
-  font-size: 19px;
+  font-size: 18px;
   background: none;
   border: none;
   padding: 0 8px;
