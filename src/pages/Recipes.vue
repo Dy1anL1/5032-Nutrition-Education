@@ -152,7 +152,7 @@ const filtered = computed(() => {
   /* Center the filter bar and make it occupy 100% of the page width (constrained by page max) */
   width: 100%;
   max-width: var(--page-max);
-  margin: 0 auto;
+  margin: 30px auto;
   padding-inline: var(--pad-inline-filters);
   box-sizing: border-box;
 }
@@ -169,7 +169,8 @@ const filtered = computed(() => {
 .filters > * {
   display: flex;
   align-items: center;
-  height: 48px; /* same as input/select height */
+  height: auto; /* allow inner controls to size naturally */
+  min-height: 48px; /* visually match control height while avoiding clipping */
 }
 
 /* Search input (with icon) */
@@ -198,7 +199,9 @@ const filtered = computed(() => {
   outline: none;
   background: transparent;
   font-size: 15px;
-  height: 44px; /* ensure same height as selects */
+  height: 48px; /* ensure same height as selects */
+  box-sizing: border-box;
+  line-height: 20px;
 }
 
 /* Make the select elements match the input height and styles */
@@ -214,7 +217,8 @@ const filtered = computed(() => {
   font-size: 15px;
   cursor: pointer;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
-  height: 44px;
+  height: 48px;
+  box-sizing: border-box;
 }
 
 /* Dropdown pill style */
