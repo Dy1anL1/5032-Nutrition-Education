@@ -55,3 +55,17 @@ fit5032-v1/
   - About.vue
   - Account.vue
 - README.md
+
+---
+
+## Installation & Running
+
+1. Clone the repo or unzip the submission:
+   ```bash
+   git clone <repo-url>
+   cd fit5032-v1
+   ```
+2. Install dependencies:
+   npm install
+3. Run the dev server:
+   npm run dev
