@@ -72,9 +72,7 @@
         <span class="val">{{ reveal ? snapshot.password : maskedPassword }}</span>
       </div>
     </div>
-    <p class="disclaimer">
-      * This card is for demonstration only. Do not display passwords in production.
-    </p>
+    <p class="disclaimer">* This card is for demonstration only.</p>
   </div>
 </template>
 

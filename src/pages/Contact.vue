@@ -8,7 +8,7 @@
   <section class="title-bar">
     <div class="title-inner">
       <h1 class="title">Contact Us</h1>
-      <p class="subtitle">Send us a message - we'll get back to you (mock).</p>
+      <p class="subtitle">Send us a message - we'll get back to you.</p>
     </div>
   </section>
 
@@ -21,7 +21,7 @@
     <textarea v-model.trim="msg" rows="4"></textarea>
 
     <button class="btn primary">Send</button>
-    <p class="toast-ok" v-if="ok">Message sent (mock).</p>
+    <p class="toast-ok" v-if="ok">Message sent.</p>
     <p class="form-errors" v-if="err">{{ err }}</p>
   </form>
 </template>
