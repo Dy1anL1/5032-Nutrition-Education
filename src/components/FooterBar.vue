@@ -31,7 +31,7 @@
             </svg>
             <a href="mailto:info@HealthyLiving.org.au">info@HealthyLiving.org.au</a>
           </li>
-          <li>2024 Healthy Living. All rights reserved. A not-for-profit organization.</li>
+          <li>Healthy Living. All rights reserved. A not-for-profit organization.</li>
           <li>
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
               <path
