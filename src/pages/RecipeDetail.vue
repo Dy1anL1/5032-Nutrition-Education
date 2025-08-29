@@ -19,7 +19,8 @@
                 <svg class="rd-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path fill="#22c55e" d="M12 2c1 0 2 .5 2 1.5S13 6 12 7s-2-1.5-2-3.5S11 2 12 2z" />
                   <circle cx="12" cy="14" r="6" fill="#22c55e" opacity="0.12" />
-                </svg> -->
+                </svg> 
+                -->
                 <h1 class="rd-title">{{ recipe.title }}</h1>
               </div>
             </header>
@@ -28,6 +29,7 @@
               <img :src="recipe.image" alt="" class="rd-image" />
             </div>
 
+            <!--
             <div class="rd-meta">
               <div class="rd-meta-item">
                 <svg class="ico" viewBox="0 0 24 24">
@@ -52,7 +54,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   />
-                </svg>
+                </svg> 
                 <span>2 servings</span>
               </div>
               <div class="rd-meta-item">
@@ -65,6 +67,7 @@
                 <span>4.5</span>
               </div>
             </div>
+            -->
 
             <p class="rd-summary">{{ recipe.summary }}</p>
 
@@ -86,9 +89,6 @@
                 </div>
                 <div class="nut-row">
                   <span>Fat</span><strong>{{ recipe.nutrition?.fat || '-' }}g</strong>
-                </div>
-                <div class="nut-row">
-                  <span>Fiber</span><strong>{{ recipe.nutrition?.fiber || '-' }}g</strong>
                 </div>
               </div>
             </div>
