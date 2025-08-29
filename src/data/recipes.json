@@ -124,5 +124,18 @@
     "ingredients": ["cauliflower", "tortillas", "cabbage slaw", "lime", "spices"],
     "steps": ["Roast spiced cauliflower", "Warm tortillas and assemble tacos with slaw and lime"],
     "nutrition": { "kcal": 390, "carbs": 50, "protein": 8, "fat": 14 }
+  },
+  {
+    "id": 12,
+    "title": "Simple Herb Omelette",
+    "tags": ["breakfast", "quick", "high-protein"],
+    "summary": "A plain, no-image recipe to compare layout - quick to make and intentionally image-less.",
+    "ingredients": ["2 eggs", "fresh parsley", "salt", "pepper", "butter"],
+    "steps": [
+      "Beat eggs with chopped parsley, salt and pepper.",
+      "Melt butter in a pan, pour in egg mixture and cook until set.",
+      "Fold and serve hot."
+    ],
+    "nutrition": { "kcal": 220, "carbs": 2, "protein": 14, "fat": 16 }
   }
 ]
