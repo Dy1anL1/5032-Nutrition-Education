@@ -42,6 +42,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import SectionTitle from '../components/SectionTitle.vue'
 
 // Test account (development only): update or remove before shipping to production.
@@ -59,6 +60,8 @@ const errors = ref({
   email: null,
   password: null,
 })
+
+const router = useRouter()
 
 function validateEmail(blur) {
   // Basic client-side email format check. We only set an error message when the
@@ -89,6 +92,10 @@ function onSubmit() {
     if (email.value === TEST_USER.email && password.value === TEST_USER.password) {
       ok.value = true
       fail.value = false
+      // brief delay so user sees success message, then navigate to Home
+      setTimeout(() => {
+        router.push('/')
+      }, 700)
     } else {
       ok.value = false
       fail.value = true
