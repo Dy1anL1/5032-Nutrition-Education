@@ -120,21 +120,24 @@ function validateEmail(blur) {
 }
 
 function validatePassword(blur) {
-  // Require at least one lowercase, one uppercase, one digit and one special char,
-  // and a minimum length of 8 characters.
-  const rules = {
-    length: password.value.length >= 8,
-    lower: /[a-z]/.test(password.value),
-    upper: /[A-Z]/.test(password.value),
-    digit: /\d/.test(password.value),
-    special: /[^\w\s]/.test(password.value),
-  }
+  // Requirement: at least 8 characters, including uppercase, lowercase, number, and special character
+  const minLength = 8
+  const val = password.value || ''
+  const hasUppercase = /[A-Z]/.test(val)
+  const hasLowercase = /[a-z]/.test(val)
+  const hasNumber = /\d/.test(val)
+  const hasSpecialChar = /[^\w\s]/.test(val)
 
-  if (!rules.length || !rules.lower || !rules.upper || !rules.digit || !rules.special) {
-    if (blur) {
-      errors.value.password =
-        'Password must be at least 8 characters and include uppercase, lowercase, a number and a symbol.'
-    }
+  if (val.length < minLength) {
+    if (blur) errors.value.password = `Password must be at least ${minLength} characters long.`
+  } else if (!hasUppercase) {
+    if (blur) errors.value.password = 'Password must contain at least one uppercase letter.'
+  } else if (!hasLowercase) {
+    if (blur) errors.value.password = 'Password must contain at least one lowercase letter.'
+  } else if (!hasNumber) {
+    if (blur) errors.value.password = 'Password must contain at least one number.'
+  } else if (!hasSpecialChar) {
+    if (blur) errors.value.password = 'Password must contain at least one special character.'
   } else {
     errors.value.password = null
   }
