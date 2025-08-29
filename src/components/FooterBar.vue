@@ -70,7 +70,7 @@
 
     <div class="container footer-bottom">
       <p>
-        © 2024 Healthy Living. All rights reserved.
+        © Healthy Living. All rights reserved.
         <span class="muted">A not-for-profit organization.</span>
       </p>
       <p class="made">
