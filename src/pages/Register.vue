@@ -120,8 +120,21 @@ function validateEmail(blur) {
 }
 
 function validatePassword(blur) {
-  if (password.value.length < 8) {
-    if (blur) errors.value.password = 'Password must be at least 8 characters.'
+  // Require at least one lowercase, one uppercase, one digit and one special char,
+  // and a minimum length of 8 characters.
+  const rules = {
+    length: password.value.length >= 8,
+    lower: /[a-z]/.test(password.value),
+    upper: /[A-Z]/.test(password.value),
+    digit: /\d/.test(password.value),
+    special: /[^\w\s]/.test(password.value),
+  }
+
+  if (!rules.length || !rules.lower || !rules.upper || !rules.digit || !rules.special) {
+    if (blur) {
+      errors.value.password =
+        'Password must be at least 8 characters and include uppercase, lowercase, a number and a symbol.'
+    }
   } else {
     errors.value.password = null
   }
