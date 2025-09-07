@@ -6,12 +6,13 @@
 -->
 <template>
   <!-- Page title bar (consistent with Recipes) -->
-  <section class="title-bar">
+  <section class="title-bar" id="home-title">
     <div class="title-inner">
-      <h1 class="title">Welcome to Healthy Living</h1>
+      <h1 class="title shine-text">Welcome to Healthy Living</h1>
       <p class="subtitle">
         Trusted recipes, practical meal planning, and easy-to-read nutrition guides.
       </p>
+      <button class="btn cta-btn" @click="scrollToHero">Get Started</button>
     </div>
   </section>
 
@@ -64,6 +65,14 @@ import recipes from '../data/recipes.json'
 
 // Featured subset used for the cards on the home page (first three entries)
 const featured = recipes.slice(0, 3)
+
+// Scroll to the hero section smoothly
+function scrollToHero() {
+  const hero = document.querySelector('.hero')
+  if (hero) {
+    hero.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 </script>
 
 <style scoped>
@@ -120,5 +129,18 @@ const featured = recipes.slice(0, 3)
   background: #22c55e;
   color: #fff;
   border-color: #22c55e;
+}
+.cta-btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.cta-btn:hover {
+  background: #18a74e;
 }
 </style>

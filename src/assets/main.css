@@ -19,32 +19,84 @@ header {
 /* Global title bar used by multiple pages (matches Recipes.vue look) */
 .title-bar {
   width: 100vw;
-  height: 12vw;
+  height: 100vh;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 20px;
-  margin-top: -25px; /* visually sit under the nav */
+  margin-top: -25px;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   background: linear-gradient(90deg, #e9f9ec 0%, #fff4eb 100%);
   border-bottom: 1px solid var(--line);
 }
+
 .title-inner {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 56px 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  align-items: center;
+  justify-content: center;
 }
+
+.cta-btn {
+  font-size: 22px;
+  padding: 16px 40px;
+  border-radius: 12px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.08);
+  transition: background 0.2s;
+}
+
+.cta-btn:hover {
+  background: #16a34a;
+}
+
 .title {
-  font-size: 48px;
+  font-size: 70px;
   line-height: 1.5;
-  margin: 0 0 12px;
+  margin: 0 0 -20px;
   font-weight: 800;
   color: #1b1b1b;
+  margin-top: -300px;
 }
+
+.shine-text {
+  background-image: linear-gradient(120deg, #16a34a 0%, #16a34a 48%, #40cab8 55%, #16a34a 58%, #16a34a 100%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 0.2em 0;
+  animation: shine 4s linear infinite;
+  display: inline-block;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
 .subtitle {
   max-width: 900px;
   margin: 0 auto;
   color: #5a6676;
-  font-size: 18px;
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 nav .brand {
@@ -78,11 +130,13 @@ nav .links a.active {
   cursor: pointer;
   background: #fff;
 }
+
 .btn.primary {
   background: var(--brand);
   color: #ffffff;
   border-color: var(--brand);
 }
+
 .btn.block {
   width: 100%;
   text-align: center;
@@ -99,6 +153,7 @@ textarea {
   font-size: 16px;
   outline: none;
 }
+
 .input:focus,
 select:focus,
 textarea:focus {
@@ -110,6 +165,7 @@ textarea:focus {
   font-size: 14px;
   margin-top: 6px;
 }
+
 .toast-ok {
   color: #0a7a2f;
   margin-top: 10px;
@@ -118,14 +174,17 @@ textarea:focus {
 /* Cards */
 .cards {
   display: grid;
-  gap: 24px; /* increased spacing between cards */
+  gap: 24px;
+  /* increased spacing between cards */
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+
 @media (min-width: 640px) {
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
 @media (min-width: 1024px) {
   .cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -138,9 +197,11 @@ textarea:focus {
   overflow: hidden;
   background: #fff;
 }
+
 .card .body {
   padding: 14px;
 }
+
 .card img {
   width: 100%;
   height: 180px;
@@ -154,10 +215,12 @@ textarea:focus {
   display: grid;
   gap: 16px;
 }
+
 .hero h1 {
   font-size: 32px;
   margin: 0;
 }
+
 .hero p {
   color: var(--muted);
 }
@@ -179,6 +242,7 @@ form.grid {
     max-width: 98vw;
     padding: 0 8px;
   }
+
   .container {
     padding: 12px 4px;
   }
@@ -193,6 +257,7 @@ form.grid {
   text-decoration: none;
   transition: color 0.18s ease;
 }
+
 .nav-links a:hover {
   color: var(--ink);
 }
@@ -221,6 +286,7 @@ form.grid {
   color: var(--green) !important;
   font-weight: 700;
 }
+
 .navbar .nav-links a.router-link-active::after,
 .navbar .nav-links a.router-link-exact-active::after {
   transform: scaleX(1);
