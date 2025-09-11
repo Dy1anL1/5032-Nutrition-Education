@@ -49,21 +49,33 @@
     </div>
   </section>
 
-  <section>
-    <div class="cards">
-      <RecipeCard v-for="r in featured" :key="r.id" :recipe="r" />
+  <section class="info-section">
+    <div class="info-content">
+      <h2>Why Choose Healthy Living?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <div class="benefit-icon">🍎</div>
+          <h3>Nutritious Choices</h3>
+          <p>Every recipe is carefully curated with balanced nutrition in mind</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">📚</div>
+          <h3>Educational Content</h3>
+          <p>Learn about nutrition science and make informed food choices</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">⏰</div>
+          <h3>Time-Saving Tools</h3>
+          <p>Efficient meal planning to save time and reduce food waste</p>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup>
 // Home page
-// Shows three highlight tiles and a few featured recipe cards.
-import RecipeCard from '../components/RecipeCard.vue'
-import recipes from '../data/recipes.json'
-
-// Featured subset used for the cards on the home page (first three entries)
-const featured = recipes.slice(0, 3)
+// Shows three highlight tiles and benefits section
 </script>
 
 <style scoped>
@@ -120,5 +132,60 @@ const featured = recipes.slice(0, 3)
   background: #22c55e;
   color: #fff;
   border-color: #22c55e;
+}
+
+.info-section {
+  margin-top: 60px;
+  padding: 40px 0;
+  background: #f8fafc;
+}
+
+.info-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.info-content h2 {
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: #1e293b;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.benefit-item {
+  background: white;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.benefit-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.benefit-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.benefit-item h3 {
+  font-size: 20px;
+  margin: 16px 0 8px 0;
+  color: #1e293b;
+}
+
+.benefit-item p {
+  color: #64748b;
+  line-height: 1.6;
 }
 </style>

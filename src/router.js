@@ -15,6 +15,8 @@ import Register from './pages/Register.vue'
 import Contact from './pages/Contact.vue'
 import About from './pages/About.vue'
 import Account from './pages/Account.vue'
+import AdminDashboard from './pages/AdminDashboard.vue'
+import NotFound from './pages/NotFound.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -36,6 +38,17 @@ const routes = [
     component: Account,
     meta: { requiresAuth: true }
   },
+  { 
+    path: '/admin', 
+    component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  // Catch-all 404 route (must be last)
+  { 
+    path: '/:pathMatch(.*)*', 
+    name: 'NotFound', 
+    component: NotFound 
+  },
 ]
 
 const router = createRouter({
@@ -48,37 +61,51 @@ const router = createRouter({
 })
 
 // Navigation guards for authentication
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // Wait for auth initialization
-  if (authStore.loading) {
-    const unwatch = authStore.$subscribe(() => {
-      if (!authStore.loading) {
-        unwatch()
-        checkRoute()
-      }
-    })
-  } else {
-    checkRoute()
+  // Wait for auth initialization with timeout
+  const maxWaitTime = 3000 // 3 seconds max wait
+  const startTime = Date.now()
+  
+  while (authStore.loading && (Date.now() - startTime) < maxWaitTime) {
+    await new Promise(resolve => setTimeout(resolve, 100))
   }
   
-  function checkRoute() {
+  // If still loading after timeout, assume not authenticated and continue
+  if (authStore.loading) {
+    console.warn('Auth initialization timeout, proceeding with navigation')
+  }
+  
+  // Check route requirements
+  try {
     // Check if route requires authentication
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      console.log('Redirecting to login - auth required')
       next('/login')
+      return
     }
+    
     // Redirect authenticated users away from guest pages
-    else if (to.meta.guest && authStore.isAuthenticated) {
+    if (to.meta.guest && authStore.isAuthenticated) {
+      console.log('Redirecting to home - user already authenticated')
       next('/')
+      return
     }
+    
     // Check admin-only routes
-    else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      console.log('Redirecting to home - admin access required')
       next('/')
+      return
     }
-    else {
-      next()
-    }
+    
+    // Allow navigation
+    next()
+  } catch (error) {
+    console.error('Router guard error:', error)
+    // On error, allow navigation to prevent getting stuck
+    next()
   }
 })
 

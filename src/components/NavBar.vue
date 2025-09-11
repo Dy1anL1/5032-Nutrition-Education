@@ -16,6 +16,10 @@
         <RouterLink to="/education">Education</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/contact">Contact</RouterLink>
+        <RouterLink v-if="authStore.isAdmin" to="/admin" class="admin-link">
+          <span class="admin-icon">⚙️</span>
+          Admin Panel
+        </RouterLink>
       </nav>
 
       <div class="actions">
@@ -38,8 +42,12 @@
         </template>
         <template v-else>
           <span class="user-info">
-            {{ authStore.user?.displayName || 'User' }}
+            {{ authStore.userProfile?.name || authStore.user?.displayName || 'User' }}
             <span v-if="authStore.isAdmin" class="role-badge">Admin</span>
+            <span v-else-if="!authStore.loading" class="role-badge" style="background: #3b82f6">
+              {{ authStore.userProfile?.role === 'admin' ? 'Admin' : 'User' }}
+            </span>
+            <span v-else class="role-badge loading" style="background: #9ca3af">...</span>
           </span>
           <button @click="handleLogout" class="logout-btn">Logout</button>
           <RouterLink to="/account" class="avatar" aria-label="Account">
@@ -212,6 +220,29 @@ const handleLogout = async () => {
   opacity: 0.8;
   display: flex;
   align-items: center;
+}
+
+.admin-link {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.admin-link:hover {
+  background: linear-gradient(135deg, #d97706 0%, #ea580c 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3) !important;
+}
+
+.admin-icon {
+  font-size: 16px;
 }
 
 @media (max-width: 960px) {

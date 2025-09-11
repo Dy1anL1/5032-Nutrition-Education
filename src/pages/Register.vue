@@ -226,9 +226,14 @@ async function onSubmit() {
   const sanitizedName = sanitizeInput(name.value)
   const sanitizedEmail = email.value.toLowerCase().trim()
   
+  console.log('Attempting to register with:', { email: sanitizedEmail, name: sanitizedName, role: role.value })
+  
   const result = await authStore.register(sanitizedEmail, password.value, sanitizedName, role.value)
   
+  console.log('Registration result:', result)
+  
   if (result.success) {
+    console.log('Registration successful, showing success UI')
     ok.value = true
     snapshot.value = { 
       name: sanitizedName, 
@@ -240,9 +245,11 @@ async function onSubmit() {
     
     // Auto redirect after showing success
     setTimeout(() => {
+      console.log('Redirecting to home page')
       router.push('/')
-    }, 500)
+    }, 1500)
   } else {
+    console.error('Registration failed:', result.error)
     errorMessage.value = result.error
     showInfo.value = false
   }

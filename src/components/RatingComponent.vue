@@ -32,6 +32,15 @@
     
     <div v-if="userRating > 0" class="user-rating">
       Your rating: {{ userRating }} star{{ userRating === 1 ? '' : 's' }}
+      <button v-if="authStore.isAdmin" @click="clearUserRating" class="admin-clear-btn">
+        Clear Rating
+      </button>
+    </div>
+    
+    <div v-if="authStore.isAdmin && stats.totalRatings > 0" class="admin-actions">
+      <button @click="clearAllRatings" class="admin-btn danger">
+        🗑️ Clear All Ratings
+      </button>
     </div>
     
     <div v-if="loading" class="loading">Updating...</div>
@@ -103,6 +112,41 @@ watch(() => authStore.isAuthenticated, () => {
     ratingStore.loadUserRating(props.itemId)
   }
 })
+
+// Admin functions
+async function clearUserRating() {
+  if (!confirm('Are you sure you want to clear this user rating?')) return
+  
+  loading.value = true
+  error.value = null
+  
+  // For admin: clear current user's rating for this item
+  const result = await ratingStore.submitRating(props.itemId, 0, props.itemType)
+  
+  if (!result.success) {
+    error.value = result.error
+  }
+  
+  loading.value = false
+}
+
+async function clearAllRatings() {
+  if (!confirm('Are you sure you want to clear ALL ratings for this item? This cannot be undone.')) return
+  
+  loading.value = true
+  error.value = null
+  
+  try {
+    const result = await ratingStore.clearAllRatings(props.itemId)
+    if (!result.success) {
+      error.value = result.error
+    }
+  } catch (err) {
+    error.value = 'Failed to clear all ratings'
+  }
+  
+  loading.value = false
+}
 </script>
 
 <style scoped>
@@ -175,6 +219,53 @@ watch(() => authStore.isAuthenticated, () => {
   font-size: 12px;
   color: #059669;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-clear-btn {
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fcd34d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-clear-btn:hover {
+  background: #fef2e8;
+  border-color: #f59e0b;
+}
+
+.admin-actions {
+  margin-top: 8px;
+}
+
+.admin-btn {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-btn:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.admin-btn.danger:hover {
+  background: #dc2626;
+  color: white;
 }
 
 .loading {

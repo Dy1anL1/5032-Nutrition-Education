@@ -17,6 +17,10 @@
       :aria-label="recipe.title || 'Recipe image'"
     >
       <div class="cal-badge">{{ (recipe.nutrition && recipe.nutrition.kcal) || '-' }} cal</div>
+      <div v-if="authStore.isAdmin" class="admin-controls">
+        <button @click="editRecipe" class="admin-btn edit" title="Edit Recipe">✏️</button>
+        <button @click="deleteRecipe" class="admin-btn delete" title="Delete Recipe">🗑️</button>
+      </div>
     </div>
 
     <div class="rc-info">
@@ -31,9 +35,24 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
+
 // Props
 // `recipe` is expected to contain fields like id, title, image, summary and nutrition.
-defineProps({ recipe: { type: Object, required: true } })
+const props = defineProps({ recipe: { type: Object, required: true } })
+
+// Emit events for parent components to handle
+const emit = defineEmits(['edit-recipe', 'delete-recipe'])
+
+function editRecipe() {
+  emit('edit-recipe', props.recipe)
+}
+
+function deleteRecipe() {
+  emit('delete-recipe', props.recipe)
+}
 </script>
 
 <style scoped>
@@ -116,5 +135,48 @@ defineProps({ recipe: { type: Object, required: true } })
   background: #22c55e; /* green on hover */
   color: #fff;
   border-color: #22c55e;
+}
+
+.admin-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.admin-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-btn.edit {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+}
+
+.admin-btn.edit:hover {
+  background: rgba(37, 99, 235, 1);
+  transform: scale(1.1);
+}
+
+.admin-btn.delete {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.admin-btn.delete:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
 }
 </style>

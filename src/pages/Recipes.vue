@@ -64,7 +64,13 @@
   <!-- Recipe Card grid -->
   <section class="grid-wrap">
     <div class="cards">
-      <RecipeCard v-for="r in filtered" :key="r.id" :recipe="r" />
+      <RecipeCard 
+        v-for="r in filtered" 
+        :key="r.id" 
+        :recipe="r" 
+        @edit-recipe="handleEditRecipe"
+        @delete-recipe="handleDeleteRecipe"
+      />
     </div>
   </section>
 </template>
@@ -112,6 +118,22 @@ const filtered = computed(() => {
     return kwOk && categoryOk && dietOk
   })
 })
+
+// Admin functions for recipe management
+function handleEditRecipe(recipe) {
+  alert(`Edit functionality for "${recipe.title}" would open an edit modal/form.`)
+}
+
+function handleDeleteRecipe(recipe) {
+  if (!confirm(`Are you sure you want to delete "${recipe.title}"?`)) return
+  
+  // Find and remove recipe from data
+  const index = data.findIndex(r => r.id === recipe.id)
+  if (index !== -1) {
+    data.splice(index, 1)
+    alert(`Recipe "${recipe.title}" deleted successfully!`)
+  }
+}
 </script>
 
 <style scoped>

@@ -126,6 +126,48 @@ export const useRatingStore = defineStore('rating', () => {
     ])
   }
 
+  const clearAllRatings = async (itemId) => {
+    try {
+      const authStore = useAuthStore()
+      if (!authStore.isAdmin) {
+        return { success: false, error: 'Admin access required' }
+      }
+
+      // Get all user ratings for this item
+      const q = query(
+        collection(db, 'userRatings'),
+        where('itemId', '==', itemId)
+      )
+      const querySnapshot = await getDocs(q)
+
+      // Delete all user ratings and reset stats
+      await runTransaction(db, async (transaction) => {
+        // Delete all user ratings
+        querySnapshot.docs.forEach(doc => {
+          transaction.delete(doc.ref)
+        })
+
+        // Reset the rating stats
+        const ratingStatsRef = doc(db, 'ratingStats', itemId)
+        transaction.set(ratingStatsRef, {
+          totalScore: 0,
+          totalRatings: 0,
+          updatedAt: new Date().toISOString()
+        })
+      })
+
+      // Update local state
+      ratings.value[itemId] = { totalScore: 0, totalRatings: 0 }
+      userRatings.value[itemId] = 0
+
+      return { success: true }
+
+    } catch (error) {
+      console.error('Error clearing all ratings:', error)
+      return { success: false, error: 'Failed to clear ratings' }
+    }
+  }
+
   return {
     ratings,
     userRatings,
@@ -134,6 +176,7 @@ export const useRatingStore = defineStore('rating', () => {
     loadRatingStats,
     loadUserRating,
     submitRating,
-    loadItemData
+    loadItemData,
+    clearAllRatings
   }
 })
