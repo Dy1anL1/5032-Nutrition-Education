@@ -28,5 +28,4 @@
   </div>
 </template>
 <script setup>
-import SectionTitle from '../components/SectionTitle.vue'
 </script>

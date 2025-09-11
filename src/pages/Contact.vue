@@ -28,7 +28,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import SectionTitle from '../components/SectionTitle.vue'
 const name = ref(''),
   email = ref(''),
   msg = ref('')

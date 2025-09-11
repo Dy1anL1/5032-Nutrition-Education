@@ -71,6 +71,11 @@
 
             <p class="rd-summary">{{ recipe.summary }}</p>
 
+            <!-- Rating Component -->
+            <div class="rating-section">
+              <RatingComponent :item-id="recipe.id.toString()" item-type="recipe" />
+            </div>
+
             <div class="rd-tags">
               <span v-for="(t, i) in recipe.tags" :key="i" class="pill">{{ t }}</span>
             </div>
@@ -122,6 +127,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import data from '../data/recipes.json'
+import RatingComponent from '../components/RatingComponent.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -233,6 +239,13 @@ function close() {
   color: #6a7483;
   margin: 10px 0;
 }
+.rating-section {
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid #e6e9ee;
+  border-bottom: 1px solid #e6e9ee;
+}
+
 .rd-tags {
   display: flex;
   gap: 8px;

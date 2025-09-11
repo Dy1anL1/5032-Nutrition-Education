@@ -19,29 +19,61 @@
       </nav>
 
       <div class="actions">
-        <router-link to="/login" class="login">Login</router-link>
-        <router-link to="/register" class="btn-signup">Sign Up</router-link>
-        <RouterLink to="/account" class="avatar" aria-label="Account">
-          <svg
-            viewBox="0 0 20 20"
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
-          </svg>
-        </RouterLink>
+        <template v-if="!authStore.isAuthenticated">
+          <router-link to="/login" class="login">Login</router-link>
+          <router-link to="/register" class="btn-signup">Sign Up</router-link>
+          <RouterLink to="/account" class="avatar" aria-label="Account">
+            <svg
+              viewBox="0 0 20 20"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
+            </svg>
+          </RouterLink>
+        </template>
+        <template v-else>
+          <span class="user-info">
+            {{ authStore.user?.displayName || 'User' }}
+            <span v-if="authStore.isAdmin" class="role-badge">Admin</span>
+          </span>
+          <button @click="handleLogout" class="logout-btn">Logout</button>
+          <RouterLink to="/account" class="avatar" aria-label="Account">
+            <svg
+              viewBox="0 0 20 20"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="8" r="4"></circle>
+              <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
+            </svg>
+          </RouterLink>
+        </template>
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
-// NavBar is intentionally presentation-first. Add JS here only if you implement
-// a mobile menu toggle or other interactive behaviour.
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogout = async () => {
+  const result = await authStore.logout()
+  if (result.success) {
+    router.push('/')
+  }
+}
 </script>
 
 <style scoped>
@@ -62,7 +94,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  height: 64px;
+  height: 80px;
   padding: 0 32px;
   width: 100%;
   box-sizing: border-box;
@@ -72,7 +104,7 @@
   display: flex;
   align-items: center;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 30px;
   color: var(--ink);
   letter-spacing: 0.2px;
   text-decoration: none;
@@ -87,14 +119,14 @@
 .nav-links {
   justify-self: center;
   display: flex;
-  gap: 48px;
+  gap: 60px;
   align-items: center;
 }
 .nav-links :deep(a) {
   font-weight: 600;
-  font-size: 19px;
+  font-size: 21px;
   color: var(--muted);
-  padding: 6px 2px;
+  padding: 3px 2px;
   position: relative;
   text-decoration: none;
   transition: color 0.18s ease;
@@ -110,7 +142,7 @@
 .login {
   color: var(--ink);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 21px;
   background: none;
   border: none;
   padding: 0 8px;
@@ -129,7 +161,7 @@
   padding: 10px 18px;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 19px;
+  font-size: 21px;
   background: #22c55e !important;
   color: #fff !important;
   border: none !important;
@@ -142,8 +174,41 @@
   background: var(--green-d);
 }
 
+.user-info {
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-badge {
+  background: var(--green);
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.logout-btn {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 20px;
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #f3f4f6;
+}
+
 .avatar {
-  margin-left: 50px;
+  margin-left: 12px;
   opacity: 0.8;
   display: flex;
   align-items: center;

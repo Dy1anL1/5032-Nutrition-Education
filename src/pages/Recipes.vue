@@ -72,7 +72,6 @@
 <script setup>
 // Local state used for filtering
 import { ref, computed } from 'vue'
-import SectionTitle from '../components/SectionTitle.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import data from '../data/recipes.json'
 
@@ -131,7 +130,7 @@ const filtered = computed(() => {
 .title-bar {
   /* full-bleed visual while staying flush under the nav */
   width: 100vw;
-  height: 12vw;
+  height: 20vw;
   margin: 20px; /* remove any top/bottom gap so title-bar touches NavBar */
   margin-top: -25px; /* cover the 1px border line from the nav header */
   margin-left: calc(50% - 50vw);
@@ -144,19 +143,6 @@ const filtered = computed(() => {
   margin: 0 auto;
   padding: var(--title-pad-block) var(--title-pad-inline);
   text-align: center;
-}
-.title {
-  font-size: 48px;
-  line-height: 2.5;
-  margin: 0 0 12px;
-  font-weight: 800;
-  color: #1b1b1b;
-}
-.subtitle {
-  max-width: 900px;
-  margin: 0 auto;
-  color: #5a6676;
-  font-size: 18px;
 }
 
 /* ========= Filter Bar ========= */

@@ -2,6 +2,7 @@
 // Maps application pages to routes. Keep routes simple - each page is a component
 // imported from the `pages/` folder.
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 
 // Pages
 import Home from './pages/Home.vue'
@@ -20,13 +21,21 @@ const routes = [
   { path: '/recipes', component: Recipes },
   // recipe detail accepts an `id` param (e.g. /recipes/2)
   { path: '/recipes/:id', component: RecipeDetail, props: true },
-  { path: '/meal-planner', component: MealPlanner },
+  { 
+    path: '/meal-planner', 
+    component: MealPlanner,
+    meta: { requiresAuth: true }
+  },
   { path: '/education', component: Education },
-  { path: '/login', component: Login },
-  { path: '/register', component: Register },
+  { path: '/login', component: Login, meta: { guest: true } },
+  { path: '/register', component: Register, meta: { guest: true } },
   { path: '/contact', component: Contact },
   { path: '/about', component: About },
-  { path: '/account', component: Account },
+  { 
+    path: '/account', 
+    component: Account,
+    meta: { requiresAuth: true }
+  },
 ]
 
 const router = createRouter({
@@ -36,6 +45,41 @@ const router = createRouter({
   scrollBehavior() {
     return { top: 0 }
   },
+})
+
+// Navigation guards for authentication
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  
+  // Wait for auth initialization
+  if (authStore.loading) {
+    const unwatch = authStore.$subscribe(() => {
+      if (!authStore.loading) {
+        unwatch()
+        checkRoute()
+      }
+    })
+  } else {
+    checkRoute()
+  }
+  
+  function checkRoute() {
+    // Check if route requires authentication
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      next('/login')
+    }
+    // Redirect authenticated users away from guest pages
+    else if (to.meta.guest && authStore.isAuthenticated) {
+      next('/')
+    }
+    // Check admin-only routes
+    else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      next('/')
+    }
+    else {
+      next()
+    }
+  }
 })
 
 export default router

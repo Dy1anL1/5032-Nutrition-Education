@@ -22,5 +22,11 @@ export default defineConfig([
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
+    }
+  },
   skipFormatting,
 ])

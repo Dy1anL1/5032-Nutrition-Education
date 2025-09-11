@@ -5,7 +5,10 @@
   - Fields: email, password; shows success/failure UI flags.
 -->
 <template>
-  <SectionTitle title="Login" subtitle="Access your saved plans and recipes" />
+  <div class="simple-title">
+    <h1>Login</h1>
+    <p>Access your saved plans and recipes</p>
+  </div>
   <form @submit.prevent="onSubmit" class="grid" style="max-width: 420px">
     <label>Email</label>
     <input
@@ -13,8 +16,8 @@
       class="input"
       type="email"
       autocomplete="email"
-      @blur="() => validateEmail(true)"
-      @input="() => validateEmail(false)"
+      @blur="() => validateEmailInput(true)"
+      @input="() => validateEmailInput(false)"
     />
     <p class="form-errors" v-if="errors.email">{{ errors.email }}</p>
 
@@ -24,82 +27,122 @@
       class="input"
       type="password"
       autocomplete="current-password"
-      @blur="() => validatePassword(true)"
-      @input="() => validatePassword(false)"
+      @blur="() => validatePasswordInput(true)"
+      @input="() => validatePasswordInput(false)"
     />
     <p class="form-errors" v-if="errors.password">{{ errors.password }}</p>
 
-    <button class="btn primary">Login</button>
+    <button class="btn primary" :disabled="loading">
+      {{ loading ? 'Signing in...' : 'Login' }}
+    </button>
     <p class="toast-ok" v-if="ok">Login successful. Redirecting...</p>
-    <p class="form-errors" v-if="fail">Incorrect email or password.</p>
+    <p class="form-errors" v-if="fail">{{ errorMessage || 'Login failed. Please try again.' }}</p>
 
     <p style="margin-top: 8px">No account? <router-link to="/register">Register</router-link></p>
   </form>
   <p class="muted" style="margin-top: 12px; font-size: 14px">
-    Test account: <strong>123@example.com</strong> / <strong>Pass123!</strong>
+    Create an account to test the authentication system.
   </p>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SectionTitle from '../components/SectionTitle.vue'
+import { useAuthStore } from '../stores/auth'
+import { validateEmail, createRateLimiter } from '../utils/security'
 
-// Test account (development only): update or remove before shipping to production.
-const TEST_USER = { email: '123@example.com', password: 'Pass123!' }
-
-// Reactive UI state
-// - `email` and `password` are bound to the form inputs.
-// - `ok` and `fail` control simple feedback messages shown to the tester.
-// - `errors` stores per-field validation messages.
-const email = ref(TEST_USER.email)
+const email = ref('')
 const password = ref('')
 const ok = ref(false)
 const fail = ref(false)
+const errorMessage = ref('')
+const loading = ref(false)
 const errors = ref({
   email: null,
   password: null,
 })
 
 const router = useRouter()
+const authStore = useAuthStore()
 
-function validateEmail(blur) {
-  // Basic client-side email format check. We only set an error message when the
-  // user blurs the field to avoid noisy inline errors while typing.
-  if (!/^\S+@\S+\.\S+$/.test(email.value)) {
-    if (blur) errors.value.email = 'Enter a valid email address.'
+// Rate limiting for login attempts
+const rateLimiter = createRateLimiter(5, 15 * 60 * 1000) // 5 attempts per 15 minutes
+
+function validateEmailInput(blur) {
+  const result = validateEmail(email.value)
+  if (!result.isValid) {
+    if (blur) errors.value.email = result.error
   } else {
     errors.value.email = null
   }
+  return result.isValid
 }
 
-function validatePassword(blur) {
-  // Simple length check for demo purposes. Production rules should be stronger
-  // and authentication handled server-side.
-  if (password.value.length < 8) {
-    if (blur) errors.value.password = 'Password must be at least 8 characters.'
+function validatePasswordInput(blur) {
+  // For login, we use simpler validation (just check if not empty)
+  // Full password validation is done during registration
+  if (!password.value || password.value.length === 0) {
+    if (blur) errors.value.password = 'Password is required'
+    return false
   } else {
     errors.value.password = null
+    return true
   }
 }
 
-function onSubmit() {
-  // Validate and perform the mock auth check against the TEST_USER.
-  // Replace with real auth flow when backend integration is available.
-  validateEmail(true)
-  validatePassword(true)
-  if (!errors.value.email && !errors.value.password) {
-    if (email.value === TEST_USER.email && password.value === TEST_USER.password) {
-      ok.value = true
-      fail.value = false
-      // brief delay so user sees success message, then navigate to Home
-      setTimeout(() => {
-        router.push('/')
-      }, 700)
-    } else {
-      ok.value = false
-      fail.value = true
-    }
+async function onSubmit() {
+  const isEmailValid = validateEmailInput(true)
+  const isPasswordValid = validatePasswordInput(true)
+  
+  if (!isEmailValid || !isPasswordValid) {
+    return
   }
+  
+  // Check rate limiting
+  const rateLimitCheck = rateLimiter.checkLimit(email.value)
+  if (!rateLimitCheck.allowed) {
+    fail.value = true
+    errorMessage.value = rateLimitCheck.error
+    return
+  }
+  
+  loading.value = true
+  fail.value = false
+  errorMessage.value = ''
+  
+  const result = await authStore.login(email.value, password.value)
+  
+  if (result.success) {
+    ok.value = true
+    rateLimiter.reset(email.value) // Reset rate limit on successful login
+    setTimeout(() => {
+      router.push('/')
+    }, 700)
+  } else {
+    fail.value = true
+    errorMessage.value = result.error
+  }
+  
+  loading.value = false
 }
 </script>
+
+<style scoped>
+.simple-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.simple-title h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #1a202c;
+}
+
+.simple-title p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+</style>
