@@ -20,7 +20,7 @@ header {
 .title-bar {
   /* full-bleed visual while staying flush under the nav */
   width: 100vw;
-  height: 20vw;
+  height: 18vw;
   margin: 20px;
   /* remove any top/bottom gap so title-bar touches NavBar */
   margin-top: -25px;
@@ -34,7 +34,11 @@ header {
 .title-inner {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: var(--title-pad-block) var(--title-pad-inline);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }
 

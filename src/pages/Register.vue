@@ -241,7 +241,7 @@ async function onSubmit() {
     // Auto redirect after showing success
     setTimeout(() => {
       router.push('/')
-    }, 2000)
+    }, 500)
   } else {
     errorMessage.value = result.error
     showInfo.value = false
