@@ -8,96 +8,116 @@
 
   <div class="meal-planner-wrapper">
     <div class="meal-planner-container">
-    <!-- Weekly Calendar View -->
-    <div class="planner-section">
-      <div class="week-navigation">
-        <button @click="previousWeek" class="nav-btn">&lt;</button>
-        <h2>{{ weekDisplay }}</h2>
-        <button @click="nextWeek" class="nav-btn">&gt;</button>
-      </div>
-
-      <div class="meal-grid">
-        <div class="meal-grid-header">
-          <div class="time-slot"></div>
-          <div v-for="day in weekdays" :key="day" class="day-header">{{ day }}</div>
+      <!-- Weekly Calendar View -->
+      <div class="planner-section">
+        <div class="week-navigation">
+          <button @click="previousWeek" class="nav-btn">&lt;</button>
+          <h2>{{ weekDisplay }}</h2>
+          <button @click="nextWeek" class="nav-btn">&gt;</button>
         </div>
 
-        <div v-for="meal in meals" :key="meal" class="meal-row">
-          <div class="meal-label">{{ meal }}</div>
-          <div v-for="day in weekdays" :key="`${day}-${meal}`" class="meal-slot"
-               @click="openRecipeSelector(day, meal)"
-               :class="{ 'has-recipe': getMealForDay(day, meal) }">
-            <div v-if="getMealForDay(day, meal)" class="assigned-meal">
-              <img :src="getMealForDay(day, meal).image" :alt="getMealForDay(day, meal).title" class="meal-image">
-              <div class="meal-info">
-                <h4>{{ getMealForDay(day, meal).title }}</h4>
-                <span class="meal-calories">{{ getMealForDay(day, meal).nutrition.kcal }} kcal</span>
-              </div>
-              <button @click.stop="removeMeal(day, meal)" class="remove-btn">×</button>
-            </div>
-            <div v-else class="empty-slot">
-              <span>+ Add meal</span>
-            </div>
+        <div class="meal-grid">
+          <div class="meal-grid-header">
+            <div class="time-slot"></div>
+            <div v-for="day in weekdays" :key="day" class="day-header">{{ day }}</div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Recipe Selection Modal -->
-    <div v-if="showRecipeSelector" class="modal-overlay" @click="closeRecipeSelector">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>Choose a Recipe for {{ selectedDay }} {{ selectedMeal }}</h3>
-          <button @click="closeRecipeSelector" class="close-btn">×</button>
-        </div>
-        
-        <div class="recipe-filters">
-          <select v-model="selectedTag" class="filter-select">
-            <option value="">All recipes</option>
-            <option v-for="tag in uniqueTags" :key="tag" :value="tag">{{ formatTag(tag) }}</option>
-          </select>
-        </div>
-
-        <div class="recipe-grid">
-          <div v-for="recipe in filteredRecipes" :key="recipe.id" 
-               class="recipe-option" @click="assignRecipe(recipe)">
-            <img :src="recipe.image" :alt="recipe.title" class="recipe-image">
-            <div class="recipe-details">
-              <h4>{{ recipe.title }}</h4>
-              <p>{{ recipe.summary }}</p>
-              <div class="recipe-tags">
-                <span v-for="tag in recipe.tags" :key="tag" class="tag">{{ formatTag(tag) }}</span>
+          <div v-for="meal in meals" :key="meal" class="meal-row">
+            <div class="meal-label">{{ meal }}</div>
+            <div
+              v-for="day in weekdays"
+              :key="`${day}-${meal}`"
+              class="meal-slot"
+              @click="openRecipeSelector(day, meal)"
+              :class="{ 'has-recipe': getMealForDay(day, meal) }"
+            >
+              <div v-if="getMealForDay(day, meal)" class="assigned-meal">
+                <img
+                  :src="getMealForDay(day, meal).image"
+                  :alt="getMealForDay(day, meal).title"
+                  class="meal-image"
+                />
+                <div class="meal-info">
+                  <h4>{{ getMealForDay(day, meal).title }}</h4>
+                  <span class="meal-calories"
+                    >{{ getMealForDay(day, meal).nutrition.kcal }} kcal</span
+                  >
+                </div>
+                <button @click.stop="removeMeal(day, meal)" class="remove-btn">×</button>
               </div>
-              <div class="nutrition-info">
-                <span>{{ recipe.nutrition.kcal }} kcal</span>
-                <span>{{ recipe.nutrition.protein }}g protein</span>
-                <span>{{ recipe.nutrition.carbs }}g carbs</span>
+              <div v-else class="empty-slot">
+                <span>+ Add meal</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Shopping List Section -->
-    <div class="shopping-section">
-      <h2>Shopping List</h2>
-      <div class="shopping-controls">
-        <button @click="generateShoppingList" class="generate-btn">Generate Shopping List</button>
-        <button v-if="shoppingList.length > 0" @click="clearShoppingList" class="clear-btn">Clear List</button>
+      <!-- Recipe Selection Modal -->
+      <div v-if="showRecipeSelector" class="modal-overlay" @click="closeRecipeSelector">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3>Choose a Recipe for {{ selectedDay }} {{ selectedMeal }}</h3>
+            <button @click="closeRecipeSelector" class="close-btn">×</button>
+          </div>
+
+          <div class="recipe-filters">
+            <select v-model="selectedTag" class="filter-select">
+              <option value="">All recipes</option>
+              <option v-for="tag in uniqueTags" :key="tag" :value="tag">
+                {{ formatTag(tag) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="recipe-grid">
+            <div
+              v-for="recipe in filteredRecipes"
+              :key="recipe.id"
+              class="recipe-option"
+              @click="assignRecipe(recipe)"
+            >
+              <img :src="recipe.image" :alt="recipe.title" class="recipe-image" />
+              <div class="recipe-details">
+                <h4>{{ recipe.title }}</h4>
+                <p>{{ recipe.summary }}</p>
+                <div class="recipe-tags">
+                  <span v-for="tag in recipe.tags" :key="tag" class="tag">{{
+                    formatTag(tag)
+                  }}</span>
+                </div>
+                <div class="nutrition-info">
+                  <span>{{ recipe.nutrition.kcal }} kcal</span>
+                  <span>{{ recipe.nutrition.protein }}g protein</span>
+                  <span>{{ recipe.nutrition.carbs }}g carbs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div v-if="shoppingList.length > 0" class="shopping-list">
-        <h3>Ingredients needed:</h3>
-        <ul class="ingredient-list">
-          <li v-for="ingredient in shoppingList" :key="ingredient" class="ingredient-item">
-            <input type="checkbox" :id="ingredient" class="ingredient-checkbox">
-            <label :for="ingredient">{{ ingredient }}</label>
-          </li>
-        </ul>
+
+      <!-- Shopping List Section -->
+      <div class="shopping-section">
+        <h2>Shopping List</h2>
+        <div class="shopping-controls">
+          <button @click="generateShoppingList" class="generate-btn">Generate Shopping List</button>
+          <button v-if="shoppingList.length > 0" @click="clearShoppingList" class="clear-btn">
+            Clear List
+          </button>
+        </div>
+
+        <div v-if="shoppingList.length > 0" class="shopping-list">
+          <h3>Ingredients needed:</h3>
+          <ul class="ingredient-list">
+            <li v-for="ingredient in shoppingList" :key="ingredient" class="ingredient-item">
+              <input type="checkbox" :id="ingredient" class="ingredient-checkbox" />
+              <label :for="ingredient">{{ ingredient }}</label>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -121,7 +141,11 @@ const shoppingList = ref([])
 onMounted(() => {
   const today = new Date()
   const mondayOffset = (today.getDay() + 6) % 7
-  currentWeekStart.value = new Date(today.getFullYear(), today.getMonth(), today.getDate() - mondayOffset)
+  currentWeekStart.value = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - mondayOffset,
+  )
 })
 
 // Computed properties
@@ -129,22 +153,22 @@ const weekDisplay = computed(() => {
   const start = new Date(currentWeekStart.value)
   const end = new Date(start)
   end.setDate(start.getDate() + 6)
-  
+
   const options = { month: 'short', day: 'numeric' }
   return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`
 })
 
 const uniqueTags = computed(() => {
   const tags = new Set()
-  recipes.forEach(recipe => {
-    recipe.tags.forEach(tag => tags.add(tag))
+  recipes.forEach((recipe) => {
+    recipe.tags.forEach((tag) => tags.add(tag))
   })
   return Array.from(tags).sort()
 })
 
 const filteredRecipes = computed(() => {
   if (!selectedTag.value) return recipes
-  return recipes.filter(recipe => recipe.tags.includes(selectedTag.value))
+  return recipes.filter((recipe) => recipe.tags.includes(selectedTag.value))
 })
 
 // Methods
@@ -178,7 +202,7 @@ const assignRecipe = (recipe) => {
   const weekKey = currentWeekStart.value.toISOString().split('T')[0]
   if (!weekPlan.value[weekKey]) weekPlan.value[weekKey] = {}
   if (!weekPlan.value[weekKey][selectedDay.value]) weekPlan.value[weekKey][selectedDay.value] = {}
-  
+
   weekPlan.value[weekKey][selectedDay.value][selectedMeal.value] = recipe
   closeRecipeSelector()
 }
@@ -196,15 +220,15 @@ const removeMeal = (day, meal) => {
 const generateShoppingList = () => {
   const weekKey = currentWeekStart.value.toISOString().split('T')[0]
   const ingredients = new Set()
-  
+
   if (weekPlan.value[weekKey]) {
-    Object.values(weekPlan.value[weekKey]).forEach(dayPlan => {
-      Object.values(dayPlan).forEach(recipe => {
-        recipe.ingredients.forEach(ingredient => ingredients.add(ingredient))
+    Object.values(weekPlan.value[weekKey]).forEach((dayPlan) => {
+      Object.values(dayPlan).forEach((recipe) => {
+        recipe.ingredients.forEach((ingredient) => ingredients.add(ingredient))
       })
     })
   }
-  
+
   shoppingList.value = Array.from(ingredients).sort()
 }
 
@@ -213,7 +237,7 @@ const clearShoppingList = () => {
 }
 
 const formatTag = (tag) => {
-  return tag.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  return tag.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
 }
 </script>
 
@@ -437,7 +461,9 @@ const formatTag = (tag) => {
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .recipe-option:hover {
@@ -500,7 +526,8 @@ const formatTag = (tag) => {
   margin-bottom: 16px;
 }
 
-.generate-btn, .clear-btn {
+.generate-btn,
+.clear-btn {
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
@@ -565,18 +592,18 @@ const formatTag = (tag) => {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .planner-section {
     min-width: auto;
     max-width: 100%;
   }
-  
+
   .shopping-section {
     flex: none;
     width: 100%;
     max-width: 600px;
   }
-  
+
   .meal-grid-header,
   .meal-row {
     grid-template-columns: 100px repeat(7, 1fr);
@@ -588,16 +615,16 @@ const formatTag = (tag) => {
   .meal-row {
     grid-template-columns: 80px repeat(7, minmax(80px, 1fr));
   }
-  
+
   .meal-slot {
     min-height: 100px;
   }
-  
+
   .modal-content {
     width: 95%;
     padding: 16px;
   }
-  
+
   .recipe-grid {
     grid-template-columns: 1fr;
   }
