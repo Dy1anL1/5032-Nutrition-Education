@@ -1,156 +1,249 @@
-# Healthy Living - Version 1
+# Healthy Living - Nutrition Education Platform
 
 ## Student Info
 
 - Name: Jiaze Li
 - Student ID: 30087724
 - Unit: FIT5032 - Basic Application Development
-- Assessment: A1.2 Version 1
+- Assessment: Full Featured Application
 
 ---
 
 ## Project Overview
 
-This project is a **Vue 3 single-page web application** developed for the non-profit project _Public Health through Nutrition Education_.
+This project is a **comprehensive Vue 3 single-page web application** developed for the non-profit project _Public Health through Nutrition Education_. The application provides a complete platform for nutrition education, recipe management, meal planning, and user community features.
 
-Version 1 implements the **basic requirements (A & B)**:
+## 🚀 Key Features Implemented
 
-- **A.1** - Application built with Vue 3 framework (Vite + Vue Router).
-- **A.2** - Responsive design: navigation adapts to mobile view; cards/grid layout adjusts across breakpoints.
-- **B.1** - Form validation: Login, Register and Contact forms demonstrate required/format/length checks and both success & failure states.
-- **B.2** - Dynamic data: Recipe list is loaded from `src/data/recipes.json` with search and tag filters; detail view shows full recipe information.
+### **Core Application (A & B Requirements)**
+- **A.1** - Vue 3 framework with Vite build tool and Vue Router for navigation
+- **A.2** - Fully responsive design with Bootstrap integration
+- **B.1** - Comprehensive form validation across all forms (Login, Register, Contact)
+- **B.2** - Dynamic recipe data management with advanced filtering and search
 
-Future versions will extend to cover requirements C-F, including authentication, admin dashboard, cloud functions and innovation features.
+### **Authentication & User Management (C Requirements)**
+- **Firebase Authentication** - Complete user registration and login system
+- **Role-based Access Control** - User and admin roles with protected routes
+- **User Profiles** - Account management with profile updates
+- **Route Protection** - Navigation guards for authenticated and admin-only pages
 
----
+### **Admin Dashboard (D Requirements)**
+- **User Management** - View, manage, and moderate user accounts
+- **System Statistics** - Real-time metrics for users, recipes, and ratings
+- **Content Moderation** - Admin controls for recipe and user management
+- **Role Assignment** - Admin can promote users and manage permissions
 
-## Recent additions (summary)
+### **Advanced Features (E & F Requirements)**
+- **Meal Planner** - Interactive weekly meal planning calendar
+- **Recipe Rating System** - Star-based ratings with statistical analysis
+- **Shopping List Generator** - Automatic ingredient compilation from meal plans
+- **Educational Content** - Comprehensive nutrition education resources
+- **Firestore Integration** - Cloud database for user data and ratings
+- **Offline Support** - Graceful handling of network connectivity issues
 
-What's new
+## 📱 Application Pages & Components
 
-I've added a few things since the first version - short list below so it's easy to see what's changed.
+### **Public Pages**
+- **Home** - Welcome page with featured content and quick navigation
+- **Recipes** - Browse recipes with search, category, and dietary filters
+- **Recipe Detail** - Detailed view with ingredients, instructions, and ratings
+- **Education** - Nutrition education resources and articles
+- **About** - Information about the platform and mission
+- **Contact** - Contact form with validation
 
-- Recipes: now 11 sample recipes in `src/data/recipes.json`.
-- Filters: search, category and diet filters on the Recipes page; controls are aligned and responsive.
-- Cards: recipe tiles got a visual refresh (bigger hero area, calorie badge, white info strip, hover effect).
-- Detail view: recipe details open in a centered modal with nutrition info, tags, ingredient list and numbered steps.
-- Home: the front-page tiles now match the recipe card style.
-- Register: added a small client-side table to show registered users (session-only).
-- General layout and spacing tweaks across pages for a cleaner look.
+### **Authentication Pages**
+- **Login** - User authentication with Firebase integration
+- **Register** - New user registration with profile creation
 
-## Notes about data and images
+### **Protected Pages** (Requires Authentication)
+- **Account** - User profile management and settings
+- **Meal Planner** - Interactive weekly meal planning with drag-and-drop
+- **Shopping Lists** - Auto-generated ingredient lists from meal plans
 
-Right now the app loads recipe data from `src/data/recipes.json` at build time. That works for local testing and the assignment, but if you plan to add lots of recipes you probably don't want to manually download an image for every item.
+### **Admin Only Pages**
+- **Admin Dashboard** - Complete admin interface for system management
 
-Quick options:
-- Zero setup: use Unsplash Source or Picsum to generate images from a keyword, e.g. `https://source.unsplash.com/800x600/?pumpkin` or `https://picsum.photos/seed/pumpkin/800/600`. No API key needed, but results are less predictable.
-- More control: register for an API (Unsplash or Pexels), search for images server-side and cache the chosen URLs (or download them to your own storage). This avoids rate limits and keeps attribution metadata.
+### **Shared Components**
+- **Navigation Bar** - Responsive navigation with user authentication status
+- **Recipe Cards** - Reusable recipe display components with ratings
+- **Rating System** - Interactive star rating component
+- **Footer** - Site-wide footer with links and information
 
-If you want, I can switch the app to fall back to Unsplash/Picsum when a local image is missing, or add a small server example that queries Unsplash and returns a stable image URL.
+## 🛠️ Technical Architecture
 
-## Dependencies and optional libraries
+### **Frontend Stack**
+- **Vue 3** with Composition API
+- **Vue Router** for client-side routing with navigation guards
+- **Pinia** for state management (auth and rating stores)
+- **Bootstrap 5** for responsive UI components
+- **Vite** for fast development and optimized builds
 
-This is a Vite + Vue 3 project. Use `package.json` for scripts and deps.
+### **Backend & Database**
+- **Firebase Authentication** for user management
+- **Firestore Database** for storing user profiles, ratings, and meal plans
+- **Environment-based Configuration** for secure API key management
 
-Optional UI helpers:
-- PrimeVue: provides components like DataTable. Install with `npm install primevue primeicons`. If you use it, import the theme and core CSS in `src/main.js`:
+### **State Management**
+- **Auth Store** - User authentication state and profile management
+- **Rating Store** - Recipe ratings and statistical calculations
+- **Route Guards** - Protecting authenticated and admin routes
 
-```js
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
+### **Data Architecture**
+- **Static Recipe Data** - JSON-based recipe storage with 11+ recipes
+- **Dynamic User Data** - Firestore collections for user profiles and interactions
+- **Real-time Updates** - Live synchronization of ratings and user data
+
+## 📦 Dependencies & Setup
+
+### **Core Dependencies**
+```json
+{
+  "vue": "^3.5.20",
+  "vue-router": "^4.5.1",
+  "pinia": "^2.3.1",
+  "firebase": "^12.2.1",
+  "bootstrap": "^5.3.8"
+}
 ```
 
-- Bootstrap: if you prefer Bootstrap utilities, install `bootstrap` and import its CSS in `src/main.js`:
-
-```js
-import 'bootstrap/dist/css/bootstrap.min.css'
+### **Environment Configuration**
+Create a `.env.local` file with your Firebase configuration:
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-## Running locally (PowerShell)
+## 🚀 Installation & Running
 
-1. Install dependencies (only once):
-```powershell
+### **Prerequisites**
+- Node.js (^20.19.0 || >=22.12.0)
+- npm or yarn package manager
+
+### **Setup Steps**
+
+1. **Clone the repository**:
+```bash
+git clone <repository-url>
+cd 5032-Nutrition-Education
+```
+
+2. **Install dependencies**:
+```bash
 npm install
 ```
 
-2. (Optional) Install PrimeVue if you want the DataTable components to work:
-```powershell
-npm install primevue primeicons
-```
+3. **Configure Firebase** (create `.env.local` with your Firebase config as shown above)
 
-3. Start dev server:
-```powershell
+4. **Start development server**:
+```bash
 npm run dev
 ```
 
-Open the app in your browser (usually http://localhost:5173). If you add PrimeVue, ensure its CSS imports are added to `src/main.js` as shown above.
+5. **Open application**: Navigate to http://localhost:5173
 
-## Development test account
-
-For convenience during development there is an in-app test account you can use to sign in on the Login page. This is a client-side mock only - remove or change it before deploying.
-
-Credentials (development only):
-
-```
-Email: 123@example.com
-Password: Pass123!
+### **Available Scripts**
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Lint code with ESLint
+npm run format   # Format code with Prettier
 ```
 
-Note: the login form currently pre-fills the email field with the test account. Authentication is mocked on the client and does not represent secure, server-side auth.
+## 👤 User Roles & Access
 
+### **Public Access**
+- Browse recipes and educational content
+- View recipe details and ratings
+- Access contact and about pages
 
-## Next steps
+### **Registered Users**
+- All public features plus:
+- Create and manage user profile
+- Rate and review recipes
+- Use meal planner for weekly planning
+- Generate shopping lists from meal plans
 
-Suggestions you can pick from:
-- Move `recipes.json` to a runtime endpoint or `public/` so the list can be updated without rebuilding.
-- Use a server-side proxy to call Unsplash/Pexels and cache image URLs (keeps rate limits and attribution under control).
+### **Admin Users**
+- All user features plus:
+- Access admin dashboard
+- View system statistics and analytics
+- Manage user accounts and roles
+- Moderate content and ratings
 
-If you want, I can make either of these changes for you - tell me which and I'll add the code.
+### **Test Accounts (Development)**
+Regular user credentials for testing:
+```
+Email: user@example.com
+Password: TestUser123!
+```
 
+Admin credentials for testing admin features:
+```
+Email: admin@example.com
+Password: AdminPass123!
+```
 
-fit5032-v1/
+*Note: These are development-only accounts for testing purposes*
 
-- index.html
-- package.json
-- vite.config.js
-- src/
-  - main.js
-  - App.vue
-  - router.js
-  - assets/
-  - base.css
-  - main.css
-  - data/
-  - recipes.json
-  - components/
-  - NavBar.vue
-  - FooterBar.vue
-  - SectionTitle.vue
-  - RecipeCard.vue
-  - pages/
-  - Home.vue
-  - Recipes.vue
-  - RecipeDetail.vue
-  - MealPlanner.vue
-  - Education.vue
-  - Login.vue
-  - Register.vue
-  - Contact.vue
-  - About.vue
-  - Account.vue
-- README.md
+## 📁 Project Structure
 
----
+```
+5032-Nutrition-Education/
+├── public/
+│   └── recipes/                 # Recipe images
+├── src/
+│   ├── components/              # Reusable Vue components
+│   │   ├── NavBar.vue          # Navigation component
+│   │   ├── FooterBar.vue       # Footer component
+│   │   ├── RecipeCard.vue      # Recipe display card
+│   │   ├── RatingComponent.vue # Star rating system
+│   │   └── SectionTitle.vue    # Page title component
+│   ├── pages/                   # Route components
+│   │   ├── Home.vue            # Landing page
+│   │   ├── Recipes.vue         # Recipe browsing
+│   │   ├── RecipeDetail.vue    # Individual recipe view
+│   │   ├── MealPlanner.vue     # Weekly meal planning
+│   │   ├── Education.vue       # Educational content
+│   │   ├── Login.vue           # User authentication
+│   │   ├── Register.vue        # User registration
+│   │   ├── Contact.vue         # Contact form
+│   │   ├── About.vue           # About page
+│   │   ├── Account.vue         # User profile
+│   │   ├── AdminDashboard.vue  # Admin interface
+│   │   └── NotFound.vue        # 404 error page
+│   ├── stores/                  # Pinia state management
+│   │   ├── auth.js             # Authentication store
+│   │   └── rating.js           # Rating system store
+│   ├── data/
+│   │   └── recipes.json        # Static recipe data
+│   ├── assets/                  # Static assets and styles
+│   ├── utils/                   # Utility functions
+│   ├── firebase.js             # Firebase configuration
+│   ├── router.js               # Vue Router setup
+│   ├── main.js                 # Application entry point
+│   └── App.vue                 # Root component
+├── .env.local                   # Environment configuration
+├── package.json                 # Dependencies and scripts
+├── vite.config.js              # Vite configuration
+└── README.md                    # Project documentation
+```
 
-## Installation & Running
+## 🎯 Learning Outcomes Achieved
 
-1. Clone the repo or unzip the submission:
-   ```bash
-   git clone <repo-url>
-   cd fit5032-v1
-   ```
-2. Install dependencies:
-   npm install
-3. Run the dev server:
-   npm run dev
+This project demonstrates mastery of:
+
+- **Vue 3 Ecosystem** - Composition API, Vue Router, Pinia
+- **Modern JavaScript** - ES6+ features, async/await, modules
+- **Firebase Integration** - Authentication, Firestore database
+- **Responsive Design** - Mobile-first approach with Bootstrap
+- **State Management** - Centralized stores and reactive data
+- **Component Architecture** - Reusable, modular components
+- **Form Validation** - Client-side validation with error handling
+- **Route Protection** - Authentication guards and role-based access
+- **Real-time Features** - Live data updates and synchronization
+- **User Experience** - Interactive interfaces and feedback systems
