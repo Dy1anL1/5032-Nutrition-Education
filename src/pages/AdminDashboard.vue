@@ -34,36 +34,72 @@
       </div>
     </section>
 
-    <!-- User Management -->
+    <!-- User Management - Interactive Table 1 -->
     <section class="management-section">
       <h2>User Management</h2>
-      <div class="users-table">
-        <div class="table-header">
-          <span>Name</span>
-          <span>Email</span>
-          <span>Role</span>
-          <span>Joined</span>
-          <span>Actions</span>
-        </div>
-        <div v-for="user in users" :key="user.id" class="table-row">
-          <span>{{ user.name }}</span>
-          <span>{{ user.email }}</span>
-          <span>
-            <span class="role-badge" :class="user.role">
-              {{ user.role === 'admin' ? 'Admin' : 'User' }}
-            </span>
+      <Vue3EasyDataTable
+        :headers="userHeaders"
+        :items="filteredUsers"
+        :rows-per-page="10"
+        buttons-pagination
+        alternating
+        border-cell
+        class="custom-data-table"
+      >
+        <template #header-name="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+          </div>
+        </template>
+
+        <template #header-email="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+            <input
+              v-model="emailSearch"
+              type="text"
+              placeholder="Search email..."
+              class="column-filter"
+            />
+          </div>
+        </template>
+
+        <template #header-role="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+            <select v-model="roleFilter" class="column-filter">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+        </template>
+
+        <template #item-role="{ role }">
+          <span class="role-badge" :class="role">
+            {{ role === 'admin' ? 'Admin' : 'User' }}
           </span>
-          <span>{{ formatDate(user.createdAt) }}</span>
+        </template>
+
+        <template #item-createdAt="{ createdAt }">
+          {{ formatDate(createdAt) }}
+        </template>
+
+        <template #item-actions="{ id, role }">
           <div class="actions">
-            <button @click="toggleUserRole(user)" class="btn-small">
-              {{ user.role === 'admin' ? 'Demote' : 'Promote' }}
+            <button @click="toggleUserRoleById(id, role)" class="btn-small">
+              {{ role === 'admin' ? 'Demote' : 'Promote' }}
             </button>
-            <button @click="deleteUser(user)" class="btn-small danger" v-if="user.id !== authStore.user?.uid">
+            <button
+              @click="deleteUserById(id)"
+              class="btn-small danger"
+              v-if="id !== authStore.user?.uid"
+            >
               Delete
             </button>
           </div>
-        </div>
-      </div>
+        </template>
+      </Vue3EasyDataTable>
     </section>
 
     <!-- Recipe Management -->
@@ -88,22 +124,74 @@
       </div>
     </section>
 
-    <!-- Rating Analytics -->
+    <!-- Rating Analytics - Interactive Table 2 -->
     <section class="management-section">
       <h2>Rating Analytics</h2>
-      <div class="ratings-list">
-        <div v-for="rating in recentRatings" :key="rating.id" class="rating-item">
-          <div class="rating-info">
-            <strong>{{ rating.recipeName }}</strong>
-            <div class="rating-details">
-              <span class="stars">{{ '★'.repeat(rating.rating) }}{{ '☆'.repeat(5-rating.rating) }}</span>
-              <span class="user">by {{ rating.userName }}</span>
-              <span class="date">{{ formatDate(rating.createdAt) }}</span>
-            </div>
+      <Vue3EasyDataTable
+        :headers="ratingHeaders"
+        :items="filteredRatings"
+        :rows-per-page="10"
+        buttons-pagination
+        alternating
+        border-cell
+        class="custom-data-table"
+      >
+        <template #header-recipeName="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+            <input
+              v-model="recipeNameSearch"
+              type="text"
+              placeholder="Search recipe..."
+              class="column-filter"
+            />
           </div>
-          <button @click="deleteRating(rating)" class="btn-small danger">Remove</button>
-        </div>
-      </div>
+        </template>
+
+        <template #header-userName="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+            <input
+              v-model="userNameSearch"
+              type="text"
+              placeholder="Search user..."
+              class="column-filter"
+            />
+          </div>
+        </template>
+
+        <template #header-rating="header">
+          <div class="filter-column">
+            <div>{{ header.text }}</div>
+            <select v-model="ratingFilter" class="column-filter">
+              <option value="">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+        </template>
+
+        <template #item-rating="{ rating }">
+          <span class="stars">{{ getStarDisplay(rating) }}</span>
+        </template>
+
+        <template #item-createdAt="{ createdAt }">
+          {{ formatDate(createdAt) }}
+        </template>
+
+        <template #item-comment="{ comment }">
+          <span class="comment-text">{{ comment || 'No comment' }}</span>
+        </template>
+
+        <template #item-actions="{ id }">
+          <button @click="deleteRatingById(id)" class="btn-small danger">
+            Remove
+          </button>
+        </template>
+      </Vue3EasyDataTable>
     </section>
   </div>
 </template>
@@ -113,8 +201,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRatingStore } from '../stores/rating'
 import { db } from '../firebase'
-import { collection, getDocs, deleteDoc, doc, updateDoc, query, orderBy, limit } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import recipesData from '../data/recipes.json'
+import Vue3EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
 
 const authStore = useAuthStore()
 const ratingStore = useRatingStore()
@@ -122,7 +212,77 @@ const ratingStore = useRatingStore()
 const users = ref([])
 const recipes = ref([])
 const ratings = ref([])
-const recentRatings = ref([])
+const allRatings = ref([])
+
+// Table headers for User Management
+const userHeaders = [
+  { text: 'Name', value: 'name', sortable: true },
+  { text: 'Email', value: 'email', sortable: true },
+  { text: 'Role', value: 'role', sortable: true },
+  { text: 'Joined Date', value: 'createdAt', sortable: true },
+  { text: 'Actions', value: 'actions', sortable: false }
+]
+
+// Table headers for Rating Analytics
+const ratingHeaders = [
+  { text: 'Recipe Name', value: 'recipeName', sortable: true },
+  { text: 'User Name', value: 'userName', sortable: true },
+  { text: 'Rating', value: 'rating', sortable: true },
+  { text: 'Comment', value: 'comment', sortable: false },
+  { text: 'Date', value: 'createdAt', sortable: true },
+  { text: 'Actions', value: 'actions', sortable: false }
+]
+
+// Search and filter states
+const emailSearch = ref('')
+const roleFilter = ref('')
+const recipeNameSearch = ref('')
+const userNameSearch = ref('')
+const ratingFilter = ref('')
+
+// Computed filtered data
+const filteredUsers = computed(() => {
+  let filtered = users.value
+
+  // Filter by email
+  if (emailSearch.value) {
+    filtered = filtered.filter(u =>
+      u.email.toLowerCase().includes(emailSearch.value.toLowerCase())
+    )
+  }
+
+  // Filter by role
+  if (roleFilter.value) {
+    filtered = filtered.filter(u => u.role === roleFilter.value)
+  }
+
+  return filtered
+})
+
+const filteredRatings = computed(() => {
+  let filtered = allRatings.value
+
+  // Filter by recipe name
+  if (recipeNameSearch.value) {
+    filtered = filtered.filter(r =>
+      r.recipeName.toLowerCase().includes(recipeNameSearch.value.toLowerCase())
+    )
+  }
+
+  // Filter by user name
+  if (userNameSearch.value) {
+    filtered = filtered.filter(r =>
+      r.userName.toLowerCase().includes(userNameSearch.value.toLowerCase())
+    )
+  }
+
+  // Filter by rating
+  if (ratingFilter.value) {
+    filtered = filtered.filter(r => r.rating === parseInt(ratingFilter.value))
+  }
+
+  return filtered
+})
 
 // Computed stats
 const userStats = computed(() => ({
@@ -138,7 +298,7 @@ const recipeStats = computed(() => ({
 
 const ratingStats = computed(() => ({
   total: ratings.value.length,
-  average: ratings.value.length > 0 
+  average: ratings.value.length > 0
     ? (ratings.value.reduce((sum, r) => sum + r.rating, 0) / ratings.value.length).toFixed(1)
     : '0.0'
 }))
@@ -160,36 +320,40 @@ async function loadData() {
     // Load recipes from local data (since they're not in Firestore)
     recipes.value = recipesData
 
-    // Load recent ratings
-    const ratingsQuery = query(
-      collection(db, 'ratings'), 
-      orderBy('createdAt', 'desc'), 
-      limit(20)
-    )
-    const ratingsSnapshot = await getDocs(ratingsQuery)
-    recentRatings.value = ratingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
-    }))
+    // Load all ratings with full details
+    const allRatingsSnapshot = await getDocs(collection(db, 'ratings'))
+    allRatings.value = allRatingsSnapshot.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        recipeName: data.recipeName || 'Unknown Recipe',
+        userName: data.userName || 'Anonymous',
+        rating: data.rating || 0,
+        comment: data.comment || '',
+        createdAt: data.createdAt?.toDate() || new Date()
+      }
+    })
 
     // Get all ratings for stats
-    const allRatingsSnapshot = await getDocs(collection(db, 'ratings'))
-    ratings.value = allRatingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
+    ratings.value = allRatings.value
 
   } catch (error) {
     console.error('Error loading admin data:', error)
   }
 }
 
-async function toggleUserRole(user) {
+// User management functions
+async function toggleUserRoleById(userId, currentRole) {
   try {
-    const newRole = user.role === 'admin' ? 'user' : 'admin'
-    await updateDoc(doc(db, 'users', user.id), { role: newRole })
-    user.role = newRole
+    const newRole = currentRole === 'admin' ? 'user' : 'admin'
+    await updateDoc(doc(db, 'users', userId), { role: newRole })
+
+    // Update local data
+    const userIndex = users.value.findIndex(u => u.id === userId)
+    if (userIndex !== -1) {
+      users.value[userIndex].role = newRole
+    }
+
     alert(`User role updated to ${newRole}`)
   } catch (error) {
     console.error('Error updating user role:', error)
@@ -197,12 +361,13 @@ async function toggleUserRole(user) {
   }
 }
 
-async function deleteUser(user) {
-  if (!confirm(`Are you sure you want to delete user ${user.name}?`)) return
-  
+async function deleteUserById(userId) {
+  const user = users.value.find(u => u.id === userId)
+  if (!confirm(`Are you sure you want to delete user ${user?.name || 'this user'}?`)) return
+
   try {
-    await deleteDoc(doc(db, 'users', user.id))
-    users.value = users.value.filter(u => u.id !== user.id)
+    await deleteDoc(doc(db, 'users', userId))
+    users.value = users.value.filter(u => u.id !== userId)
     alert('User deleted successfully')
   } catch (error) {
     console.error('Error deleting user:', error)
@@ -221,25 +386,31 @@ function deleteRecipe(recipe) {
   alert('Recipe deleted successfully (local only - would need backend implementation)')
 }
 
-async function deleteRating(rating) {
+// Rating management functions
+async function deleteRatingById(ratingId) {
   if (!confirm('Are you sure you want to delete this rating?')) return
-  
+
   try {
-    await deleteDoc(doc(db, 'ratings', rating.id))
-    recentRatings.value = recentRatings.value.filter(r => r.id !== rating.id)
+    await deleteDoc(doc(db, 'ratings', ratingId))
+    allRatings.value = allRatings.value.filter(r => r.id !== ratingId)
+    ratings.value = allRatings.value
     alert('Rating deleted successfully')
-    
-    // Refresh stats
-    await loadData()
   } catch (error) {
     console.error('Error deleting rating:', error)
     alert('Failed to delete rating')
   }
 }
 
+// Utility functions
 function formatDate(date) {
   if (!date) return 'Unknown'
   return new Date(date).toLocaleDateString()
+}
+
+function getStarDisplay(rating) {
+  const filledStar = '\u2605'
+  const emptyStar = '\u2606'
+  return filledStar.repeat(rating) + emptyStar.repeat(5 - rating)
 }
 </script>
 
@@ -460,22 +631,71 @@ function formatDate(date) {
   color: #fbbf24;
 }
 
+/* Custom DataTable Styles */
+.custom-data-table {
+  --easy-table-border: 1px solid #e5e7eb;
+  --easy-table-row-border: 1px solid #f3f4f6;
+  --easy-table-header-font-size: 14px;
+  --easy-table-header-height: 50px;
+  --easy-table-header-font-color: #374151;
+  --easy-table-header-background-color: #f8fafc;
+  --easy-table-body-row-height: 50px;
+  --easy-table-body-row-font-size: 14px;
+  --easy-table-body-row-font-color: #1f2937;
+  --easy-table-body-row-hover-font-color: #1f2937;
+  --easy-table-body-row-hover-background-color: #f9fafb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.column-filter {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.column-filter:focus {
+  outline: none;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+}
+
+.comment-text {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 @media (max-width: 768px) {
   .table-header,
   .table-row {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
   .table-header {
     display: none;
   }
-  
+
   .table-row {
     display: block;
     padding: 16px;
   }
-  
+
   .table-row > span {
     display: block;
     margin-bottom: 8px;
