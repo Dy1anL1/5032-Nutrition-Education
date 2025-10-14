@@ -27,68 +27,6 @@ if (SENDGRID_API_KEY) {
 }
 
 /**
- * Send email via SendGrid with optional attachment
- * Cloud Function callable from client
- */
-exports.sendEmail = functions.https.onCall(async (data, context) => {
-  // Verify authentication
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-      'unauthenticated',
-      'User must be authenticated to send email'
-    );
-  }
-
-  const { to, subject, text, html, attachmentBase64, attachmentFilename, attachmentType } = data;
-
-  // Validate required fields
-  if (!to || !subject || (!text && !html)) {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      'Missing required email fields (to, subject, text/html)'
-    );
-  }
-
-  // Get sender email from environment or use default
-  const fromEmail = SENDGRID_FROM_EMAIL;
-
-  try {
-    const msg = {
-      to,
-      from: fromEmail,
-      subject,
-      text: text || '',
-      html: html || text || '',
-    };
-
-    // Add attachment if provided
-    if (attachmentBase64 && attachmentFilename) {
-      msg.attachments = [
-        {
-          content: attachmentBase64,
-          filename: attachmentFilename,
-          type: attachmentType || 'application/pdf',
-          disposition: 'attachment',
-        },
-      ];
-    }
-
-    await sgMail.send(msg);
-
-    // Log the email sent
-    console.log(`Email sent to ${to} with subject: ${subject}`);
-
-    return {
-      success: true,
-      message: 'Email sent successfully',
-    };
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to send email: ' + error.message);
-  }
-});
-
-/**
  * Send welcome email when new user registers
  * Triggered automatically on user creation
  */
@@ -181,56 +119,6 @@ exports.sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
   } catch (error) {
     console.error('Error sending welcome email:', error);
     return null;
-  }
-});
-
-/**
- * Send bulk emails to multiple users (admin only)
- * Cloud Function callable from admin dashboard
- */
-exports.sendBulkEmail = functions.https.onCall(async (data, context) => {
-  // Verify authentication and admin role
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
-  }
-
-  // Check if user is admin
-  const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-  if (!userDoc.exists || userDoc.data().role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can send bulk emails');
-  }
-
-  const { recipients, subject, html, text } = data;
-
-  if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
-    throw new functions.https.HttpsError('invalid-argument', 'Recipients array is required');
-  }
-
-  if (!subject || (!text && !html)) {
-    throw new functions.https.HttpsError('invalid-argument', 'Subject and message content required');
-  }
-
-  try {
-    const messages = recipients.map((email) => ({
-      to: email,
-      from: SENDGRID_FROM_EMAIL,
-      subject,
-      text: text || '',
-      html: html || text || '',
-    }));
-
-    await sgMail.send(messages);
-
-    console.log(`Bulk email sent to ${recipients.length} recipients`);
-
-    return {
-      success: true,
-      message: `Successfully sent ${recipients.length} emails`,
-      count: recipients.length,
-    };
-  } catch (error) {
-    console.error('Error sending bulk email:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to send bulk email: ' + error.message);
   }
 });
 
