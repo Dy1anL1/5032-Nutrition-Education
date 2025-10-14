@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "nutritioneducation-jiaze"
-  }
+    "default": "nutritioneducation-jiaze",
+    "default ": "nutritioneducation-jiaze"
+  },
+  "targets": {},
+  "etags": {}
 }

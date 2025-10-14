@@ -33,7 +33,13 @@ This project is a **comprehensive Vue 3 single-page web application** developed 
 - **Content Moderation** - Admin controls for recipe and user management
 - **Role Assignment** - Admin can promote users and manage permissions
 
+### **Category D Requirements**
+- **D.1** - Firebase Authentication with role-based access
+- **D.2** - Email functionality with SendGrid (contact form, welcome emails, attachments)
+- **D.3** - Interactive data tables with sort, search, and pagination
+
 ### **Advanced Features (E & F Requirements)**
+- **E.1** - Firebase Cloud Functions for email automation
 - **Meal Planner** - Interactive weekly meal planning calendar
 - **Recipe Rating System** - Star-based ratings with statistical analysis
 - **Shopping List Generator** - Automatic ingredient compilation from meal plans
@@ -247,3 +253,41 @@ This project demonstrates mastery of:
 - **Route Protection** - Authentication guards and role-based access
 - **Real-time Features** - Live data updates and synchronization
 - **User Experience** - Interactive interfaces and feedback systems
+
+---
+
+## Email Functionality Setup (D.2)
+
+This application uses SendGrid API for email functionality including contact forms, welcome emails, and attachments.
+
+### Quick Setup
+
+1. **Get SendGrid API Key**:
+   - Sign up at https://sendgrid.com (Free: 100 emails/day)
+   - Verify your sender email address
+   - Create API Key with Full Access
+   - Copy the API key
+
+2. **Configure Firebase** (requires Blaze plan):
+   ```bash
+   firebase login
+   firebase use --add
+   firebase functions:config:set sendgrid.key="YOUR_API_KEY"
+   firebase functions:config:set sendgrid.from_email="your-verified-email@gmail.com"
+   firebase functions:config:set sendgrid.admin_email="admin@example.com"
+   ```
+
+3. **Deploy Functions**:
+   ```bash
+   cd functions
+   npm install
+   cd ..
+   firebase deploy --only functions
+   ```
+
+### Features
+
+- **Contact Form**: Sends email to admin and confirmation to sender
+- **Welcome Email**: Automatic email when users register
+- **Test Email with Attachment**: Admin dashboard feature for testing PDF attachments
+- **Bulk Email**: Admin can send emails to multiple users (F requirement)

@@ -4,7 +4,15 @@
       <h1 class="title">Admin Dashboard</h1>
       <p class="subtitle">Manage users, recipes, and view system statistics</p>
     </div>
+    <div class="title-actions">
+      <button @click="showEmailTestModal = true" class="btn-test-email">
+        Test Email with Attachment
+      </button>
+    </div>
   </section>
+
+  <!-- Email Test Modal -->
+  <EmailTestModal :show="showEmailTestModal" @close="showEmailTestModal = false" />
 
   <div class="admin-content">
     <!-- Quick Stats -->
@@ -199,20 +207,20 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import { useRatingStore } from '../stores/rating'
 import { db } from '../firebase'
 import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import recipesData from '../data/recipes.json'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
+import EmailTestModal from '../components/EmailTestModal.vue'
 
 const authStore = useAuthStore()
-const ratingStore = useRatingStore()
 
 const users = ref([])
 const recipes = ref([])
 const ratings = ref([])
 const allRatings = ref([])
+const showEmailTestModal = ref(false)
 
 // Table headers for User Management
 const userHeaders = [
@@ -680,7 +688,48 @@ function getStarDisplay(rating) {
   display: inline-block;
 }
 
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title-inner {
+  flex: 1;
+}
+
+.title-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-test-email {
+  padding: 10px 20px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-test-email:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(34, 197, 94, 0.3);
+}
+
 @media (max-width: 768px) {
+  .title-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .table-header,
   .table-row {
     grid-template-columns: 1fr;
