@@ -1,11 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
-  updateProfile 
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
@@ -181,6 +183,52 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider()
+      const userCredential = await signInWithPopup(auth, provider)
+      user.value = userCredential.user
+
+      // Check if user profile exists
+      const userDocRef = doc(db, 'users', userCredential.user.uid)
+      const userDoc = await getDoc(userDocRef)
+
+      if (!userDoc.exists()) {
+        // Create new user profile for Google sign-in users
+        const profileData = {
+          name: userCredential.user.displayName || 'User',
+          email: userCredential.user.email,
+          role: 'user',
+          createdAt: new Date()
+        }
+
+        // Save to Firestore
+        await setDoc(userDocRef, profileData)
+
+        // Update local state
+        userProfile.value = {
+          ...profileData,
+          createdAt: profileData.createdAt.toISOString()
+        }
+
+        // Cache locally
+        localStorage.setItem(
+          `userProfile_${userCredential.user.uid}`,
+          JSON.stringify(userProfile.value)
+        )
+      } else {
+        // Load existing profile
+        await loadUserProfile(userCredential.user.uid)
+      }
+
+      loading.value = false
+      return { success: true }
+    } catch (error) {
+      console.error('Google sign-in error:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
   const promoteToAdmin = async () => {
     if (!user.value) return { success: false, error: 'No user logged in' }
     
@@ -236,6 +284,7 @@ export const useAuthStore = defineStore('auth', () => {
     initializeAuth,
     register,
     login,
+    loginWithGoogle,
     logout,
     promoteToAdmin
   }
