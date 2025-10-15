@@ -16,6 +16,7 @@ import Contact from './pages/Contact.vue'
 import About from './pages/About.vue'
 import Account from './pages/Account.vue'
 import AdminDashboard from './pages/AdminDashboard.vue'
+import HealthyPlaces from './pages/HealthyPlaces.vue'
 import NotFound from './pages/NotFound.vue'
 
 const routes = [
@@ -23,12 +24,13 @@ const routes = [
   { path: '/recipes', component: Recipes },
   // recipe detail accepts an `id` param (e.g. /recipes/2)
   { path: '/recipes/:id', component: RecipeDetail, props: true },
-  { 
-    path: '/meal-planner', 
+  {
+    path: '/meal-planner',
     component: MealPlanner,
     meta: { requiresAuth: true }
   },
   { path: '/education', component: Education },
+  { path: '/healthy-places', component: HealthyPlaces },
   { path: '/login', component: Login, meta: { guest: true } },
   { path: '/register', component: Register, meta: { guest: true } },
   { path: '/contact', component: Contact },

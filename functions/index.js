@@ -123,6 +123,153 @@ exports.sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
 });
 
 /**
+ * Send email with optional attachment
+ * Cloud Function callable from admin dashboard (for testing)
+ */
+exports.sendEmail = functions.https.onCall(async (data) => {
+  const { to, subject, text, html, attachmentBase64, attachmentFilename, attachmentType } = data;
+
+  console.log('sendEmail called with:', { to, subject, hasAttachment: !!attachmentBase64 });
+
+  if (!to || !subject || (!text && !html)) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'Recipient, subject, and message content are required'
+    );
+  }
+
+  try {
+    const msg = {
+      to,
+      from: SENDGRID_FROM_EMAIL,
+      subject,
+      text: text || '',
+      html: html || '',
+    };
+
+    // Add attachment if provided
+    if (attachmentBase64 && attachmentFilename) {
+      msg.attachments = [
+        {
+          content: attachmentBase64,
+          filename: attachmentFilename,
+          type: attachmentType || 'application/pdf',
+          disposition: 'attachment',
+        },
+      ];
+      console.log('Attachment added:', attachmentFilename);
+    }
+
+    const response = await sgMail.send(msg);
+    console.log('Email sent successfully');
+    console.log('SendGrid response:', JSON.stringify(response[0]?.statusCode));
+
+    return {
+      success: true,
+      message: 'Email sent successfully',
+    };
+  } catch (error) {
+    console.error('Error sending email - Full error:', JSON.stringify(error, null, 2));
+    console.error('Error response:', error.response?.body);
+    throw new functions.https.HttpsError('internal', 'Failed to send email: ' + error.message);
+  }
+});
+
+/**
+ * Calculate nutrition statistics for a user's meal plan
+ * Cloud Function callable from meal planner page
+ */
+exports.calculateNutritionStats = functions.https.onCall(async (data, context) => {
+  // Check if user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'User must be authenticated to calculate nutrition stats'
+    );
+  }
+
+  const { recipes } = data;
+
+  console.log('calculateNutritionStats called for user:', context.auth.uid);
+  console.log('Number of recipes:', recipes?.length);
+
+  if (!recipes || !Array.isArray(recipes) || recipes.length === 0) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'Recipes array is required'
+    );
+  }
+
+  try {
+    // Calculate total nutrition
+    const totalNutrition = {
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      fiber: 0,
+    };
+
+    let totalRecipes = 0;
+
+    recipes.forEach((recipe) => {
+      if (recipe.nutrition) {
+        totalNutrition.calories += recipe.nutrition.calories || 0;
+        totalNutrition.protein += recipe.nutrition.protein || 0;
+        totalNutrition.carbs += recipe.nutrition.carbs || 0;
+        totalNutrition.fat += recipe.nutrition.fat || 0;
+        totalNutrition.fiber += recipe.nutrition.fiber || 0;
+        totalRecipes++;
+      }
+    });
+
+    // Calculate averages
+    const averageNutrition = {
+      calories: totalRecipes > 0 ? Math.round(totalNutrition.calories / totalRecipes) : 0,
+      protein: totalRecipes > 0 ? Math.round(totalNutrition.protein / totalRecipes) : 0,
+      carbs: totalRecipes > 0 ? Math.round(totalNutrition.carbs / totalRecipes) : 0,
+      fat: totalRecipes > 0 ? Math.round(totalNutrition.fat / totalRecipes) : 0,
+      fiber: totalRecipes > 0 ? Math.round(totalNutrition.fiber / totalRecipes) : 0,
+    };
+
+    // Calculate daily recommended percentage (based on 2000 calorie diet)
+    const dailyRecommended = {
+      calories: 2000,
+      protein: 50, // grams
+      carbs: 300, // grams
+      fat: 70, // grams
+      fiber: 25, // grams
+    };
+
+    const percentages = {
+      calories: Math.round((totalNutrition.calories / dailyRecommended.calories) * 100),
+      protein: Math.round((totalNutrition.protein / dailyRecommended.protein) * 100),
+      carbs: Math.round((totalNutrition.carbs / dailyRecommended.carbs) * 100),
+      fat: Math.round((totalNutrition.fat / dailyRecommended.fat) * 100),
+      fiber: Math.round((totalNutrition.fiber / dailyRecommended.fiber) * 100),
+    };
+
+    const result = {
+      total: totalNutrition,
+      average: averageNutrition,
+      percentages,
+      recipesAnalyzed: totalRecipes,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('Nutrition stats calculated:', result);
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error('Error calculating nutrition stats:', error);
+    throw new functions.https.HttpsError('internal', 'Failed to calculate nutrition stats: ' + error.message);
+  }
+});
+
+/**
  * Send contact form submission email
  * Cloud Function callable from contact page
  */

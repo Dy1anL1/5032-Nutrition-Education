@@ -13,6 +13,7 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/recipes">Recipes</RouterLink>
         <RouterLink to="/meal-planner">Meal Planner</RouterLink>
+        <RouterLink to="/healthy-places">Healthy Places</RouterLink>
         <RouterLink to="/education">Education</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/contact">Contact</RouterLink>
