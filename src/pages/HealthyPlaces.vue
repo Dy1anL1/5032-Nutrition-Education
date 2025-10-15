@@ -46,6 +46,12 @@
     <!-- Map Container -->
     <div class="map-container">
       <div id="map" ref="mapElement"></div>
+
+      <!-- Loading Overlay -->
+      <div v-if="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">{{ loadingMessage }}</p>
+      </div>
     </div>
 
     <!-- Results -->
@@ -94,26 +100,36 @@ const places = ref([])
 const loading = ref(false)
 const searched = ref(false)
 const userLocation = ref(null)
+const loadingMessage = ref('Searching...')
 
 // Category configurations
 const categories = {
   restaurant: {
     name: 'Healthy Restaurants',
     icon: '🍽️',
-    types: ['restaurant', 'cafe', 'fast_food'],
+    color: '#f97316', // orange
+    amenityTypes: ['restaurant', 'cafe', 'fast_food'],
+    leisureTypes: [],
+    shopTypes: [],
     keywords: ['healthy', 'organic', 'vegan', 'vegetarian', 'salad']
   },
   gym: {
     name: 'Gyms & Fitness Centers',
     icon: '💪',
-    types: ['gym', 'fitness_centre', 'sports_centre'],
+    color: '#8b5cf6', // purple
+    amenityTypes: ['gym', 'fitness_centre', 'sports_centre', 'fitness_center', 'sports_center'],
+    leisureTypes: ['fitness_centre', 'sports_centre', 'fitness_station', 'sports_center', 'fitness_center'],
+    shopTypes: ['sports'],
     keywords: ['gym', 'fitness', 'yoga', 'pilates']
   },
   supermarket: {
     name: 'Supermarkets & Organic Stores',
     icon: '🛒',
-    types: ['supermarket', 'grocery', 'greengrocer'],
-    keywords: ['organic', 'health food', 'whole foods', 'fresh']
+    color: '#22c55e', // green
+    amenityTypes: ['marketplace'],
+    leisureTypes: [],
+    shopTypes: ['supermarket', 'convenience', 'greengrocer', 'organic'],
+    keywords: ['coles', 'woolworths', 'aldi', 'iga', 'organic']
   }
 }
 
@@ -157,6 +173,7 @@ async function searchPlaces() {
 
   try {
     // Geocode the address
+    loadingMessage.value = 'Finding your location...'
     const location = await geocodeAddress(searchAddress.value)
     userLocation.value = location
 
@@ -173,16 +190,27 @@ async function searchPlaces() {
     }).addTo(map).bindPopup('Your Location')
 
     // Search for places using Overpass API (OpenStreetMap)
+    loadingMessage.value = `Searching for nearby ${getCategoryName().toLowerCase()}...`
     const foundPlaces = await searchNearbyPlaces(location, selectedCategory.value)
     places.value = foundPlaces
 
     // Add markers for each place
     foundPlaces.forEach(place => {
-      const marker = L.marker([place.lat, place.lng])
+      const categoryIcon = categories[place.category]?.icon || '📍'
+      const categoryColor = categories[place.category]?.color || '#3b82f6'
+
+      const marker = L.marker([place.lat, place.lng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: `<div class="marker-pin" style="background-color: ${categoryColor}">${categoryIcon}</div>`,
+          iconSize: [40, 40],
+          iconAnchor: [20, 40]
+        })
+      })
         .addTo(map)
         .bindPopup(`
           <div class="popup-content">
-            <h3>${place.name}</h3>
+            <h3>${categoryIcon} ${place.name}</h3>
             <p>${place.address}</p>
             <p><strong>${place.distance} km away</strong></p>
           </div>
@@ -205,6 +233,7 @@ async function useCurrentLocation() {
   }
 
   loading.value = true
+  loadingMessage.value = 'Getting your current location...'
 
   navigator.geolocation.getCurrentPosition(
     async (position) => {
@@ -214,6 +243,7 @@ async function useCurrentLocation() {
       }
 
       // Reverse geocode to get address
+      loadingMessage.value = 'Finding your address...'
       const address = await reverseGeocode(location)
       searchAddress.value = address
       userLocation.value = location
@@ -229,28 +259,64 @@ async function useCurrentLocation() {
 }
 
 async function geocodeAddress(address) {
-  // Use Nominatim (OpenStreetMap) for geocoding
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
-  )
-  const data = await response.json()
+  try {
+    // Use Nominatim (OpenStreetMap) for geocoding
+    // Add delay to respect rate limiting (max 1 request per second)
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
-  if (data && data.length > 0) {
-    return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon)
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+      {
+        headers: {
+          'User-Agent': 'NutritionEducationApp/1.0'
+        }
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Geocoding failed: ${response.status}`)
     }
-  } else {
-    throw new Error('Address not found')
+
+    const data = await response.json()
+    console.log('Geocoding result:', data)
+
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon)
+      }
+    } else {
+      throw new Error(`Could not find location: "${address}". Try "Clayton VIC 3800, Australia"`)
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error)
+    throw error
   }
 }
 
 async function reverseGeocode(location) {
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`
-  )
-  const data = await response.json()
-  return data.display_name || 'Unknown location'
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`,
+      {
+        headers: {
+          'User-Agent': 'NutritionEducationApp/1.0'
+        }
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Reverse geocoding failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.display_name || 'Unknown location'
+  } catch (error) {
+    console.error('Reverse geocoding error:', error)
+    return 'Unknown location'
+  }
 }
 
 async function searchNearbyPlaces(location, category) {
@@ -258,47 +324,102 @@ async function searchNearbyPlaces(location, category) {
   const radius = 5000 // 5 km
   const categoryConfig = categories[category]
 
-  // Build Overpass query
-  const types = categoryConfig.types.map(type => `node["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`).join('')
+  // Build Overpass query - search both nodes AND ways
+  const amenityNodeQueries = categoryConfig.amenityTypes.map(type =>
+    `node["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
+
+  const amenityWayQueries = categoryConfig.amenityTypes.map(type =>
+    `way["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
+
+  const leisureNodeQueries = categoryConfig.leisureTypes.map(type =>
+    `node["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
+
+  const leisureWayQueries = categoryConfig.leisureTypes.map(type =>
+    `way["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
+
+  const shopNodeQueries = categoryConfig.shopTypes.map(type =>
+    `node["shop"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
+
+  const shopWayQueries = categoryConfig.shopTypes.map(type =>
+    `way["shop"="${type}"](around:${radius},${location.lat},${location.lng});`
+  ).join('')
 
   const query = `
-    [out:json];
+    [out:json][timeout:25];
     (
-      ${types}
+      ${amenityNodeQueries}
+      ${amenityWayQueries}
+      ${leisureNodeQueries}
+      ${leisureWayQueries}
+      ${shopNodeQueries}
+      ${shopWayQueries}
     );
-    out body;
+    out center body;
   `
 
-  const response = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    body: query
-  })
+  console.log('Overpass query:', query)
 
-  const data = await response.json()
-
-  // Process results
-  const results = data.elements
-    .filter(element => element.tags && element.tags.name)
-    .map(element => {
-      const distance = calculateDistance(
-        location.lat, location.lng,
-        element.lat, element.lon
-      )
-
-      return {
-        name: element.tags.name,
-        lat: element.lat,
-        lng: element.lon,
-        address: formatAddress(element.tags),
-        category: category,
-        distance: distance.toFixed(2),
-        tags: element.tags
-      }
+  try {
+    const response = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      body: query
     })
-    .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
-    .slice(0, 20) // Limit to 20 results
 
-  return results
+    if (!response.ok) {
+      throw new Error(`Overpass API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log('Overpass API response:', data)
+
+    if (!data.elements || data.elements.length === 0) {
+      console.warn('No results from Overpass API')
+      return []
+    }
+
+    // Process results
+    const results = data.elements
+      .filter(element => element.tags && element.tags.name)
+      .map(element => {
+        // For ways, use center coordinates
+        const lat = element.lat || element.center?.lat
+        const lon = element.lon || element.center?.lon
+
+        if (!lat || !lon) {
+          console.warn('Missing coordinates for element:', element)
+          return null
+        }
+
+        const distance = calculateDistance(
+          location.lat, location.lng,
+          lat, lon
+        )
+
+        return {
+          name: element.tags.name,
+          lat: lat,
+          lng: lon,
+          address: formatAddress(element.tags),
+          category: category,
+          distance: distance.toFixed(2),
+          tags: element.tags
+        }
+      })
+      .filter(result => result !== null) // Remove invalid results
+      .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
+      .slice(0, 20) // Limit to 20 results
+
+    console.log(`Found ${results.length} places for category: ${category}`)
+    return results
+  } catch (error) {
+    console.error('Error fetching from Overpass API:', error)
+    throw new Error(`Failed to search for places: ${error.message}`)
+  }
 }
 
 function formatAddress(tags) {
@@ -499,6 +620,7 @@ function getCategoryName() {
 }
 
 .map-container {
+  position: relative;
   height: 500px;
   border-radius: 12px;
   overflow: hidden;
@@ -509,6 +631,49 @@ function getCategoryName() {
 #map {
   height: 100%;
   width: 100%;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #e5e7eb;
+  border-top-color: #22c55e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .results {
@@ -616,6 +781,40 @@ function getCategoryName() {
   background: transparent;
   border: none;
   font-size: 24px;
+}
+
+/* Custom marker styles */
+:deep(.custom-marker) {
+  background: transparent;
+  border: none;
+}
+
+:deep(.marker-pin) {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 50% 50% 0;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -20px 0 0 -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+}
+
+:deep(.marker-pin::after) {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin: 0 0 0 0;
+  background: white;
+  position: absolute;
+  border-radius: 50%;
+  transform: rotate(45deg);
 }
 
 @media (max-width: 768px) {
