@@ -1,19 +1,19 @@
 <template>
   <section class="title-bar">
     <div class="title-inner">
-      <h1 class="title">Meal Planner</h1>
-      <p class="subtitle">Plan your weekly meals and generate shopping lists</p>
+      <h1 class="title">3-Day Meal Planner</h1>
+      <p class="subtitle">Plan your meals for 3 days and buy fresh ingredients</p>
     </div>
   </section>
 
   <div class="meal-planner-wrapper">
     <div class="meal-planner-container">
-      <!-- Weekly Calendar View -->
+      <!-- 3-Day Plan View -->
       <div class="planner-section">
         <div class="week-navigation">
-          <button @click="previousWeek" class="nav-btn">&lt;</button>
-          <h2>{{ weekDisplay }}</h2>
-          <button @click="nextWeek" class="nav-btn">&gt;</button>
+          <button @click="previousPlan" class="nav-btn">&lt;</button>
+          <h2>{{ planDisplay }}</h2>
+          <button @click="nextPlan" class="nav-btn">&gt;</button>
         </div>
 
         <div class="meal-grid">
@@ -125,7 +125,7 @@
 import { ref, computed, onMounted } from 'vue'
 import recipes from '../data/recipes.json'
 
-const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const weekdays = ['Day 1', 'Day 2', 'Day 3']
 const meals = ['Breakfast', 'Lunch', 'Dinner']
 
 // State
@@ -149,10 +149,10 @@ onMounted(() => {
 })
 
 // Computed properties
-const weekDisplay = computed(() => {
+const planDisplay = computed(() => {
   const start = new Date(currentWeekStart.value)
   const end = new Date(start)
-  end.setDate(start.getDate() + 6)
+  end.setDate(start.getDate() + 2) // 3 days instead of 7
 
   const options = { month: 'short', day: 'numeric' }
   return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`
@@ -172,12 +172,12 @@ const filteredRecipes = computed(() => {
 })
 
 // Methods
-const previousWeek = () => {
-  currentWeekStart.value = new Date(currentWeekStart.value.getTime() - 7 * 24 * 60 * 60 * 1000)
+const previousPlan = () => {
+  currentWeekStart.value = new Date(currentWeekStart.value.getTime() - 3 * 24 * 60 * 60 * 1000)
 }
 
-const nextWeek = () => {
-  currentWeekStart.value = new Date(currentWeekStart.value.getTime() + 7 * 24 * 60 * 60 * 1000)
+const nextPlan = () => {
+  currentWeekStart.value = new Date(currentWeekStart.value.getTime() + 3 * 24 * 60 * 60 * 1000)
 }
 
 const getMealForDay = (day, meal) => {
@@ -298,7 +298,7 @@ const formatTag = (tag) => {
 
 .meal-grid-header {
   display: grid;
-  grid-template-columns: 120px repeat(7, 1fr);
+  grid-template-columns: 120px repeat(3, 1fr);
   background: #f8fafc;
   border-bottom: 2px solid #e2e8f0;
 }
@@ -318,7 +318,7 @@ const formatTag = (tag) => {
 
 .meal-row {
   display: grid;
-  grid-template-columns: 120px repeat(7, 1fr);
+  grid-template-columns: 120px repeat(3, 1fr);
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -606,14 +606,14 @@ const formatTag = (tag) => {
 
   .meal-grid-header,
   .meal-row {
-    grid-template-columns: 100px repeat(7, 1fr);
+    grid-template-columns: 100px repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .meal-grid-header,
   .meal-row {
-    grid-template-columns: 80px repeat(7, minmax(80px, 1fr));
+    grid-template-columns: 80px repeat(3, minmax(100px, 1fr));
   }
 
   .meal-slot {
