@@ -237,18 +237,69 @@ async function useCurrentLocation() {
 
   navigator.geolocation.getCurrentPosition(
     async (position) => {
-      const location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
+      try {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        }
+
+        // Reverse geocode to get address for display
+        loadingMessage.value = 'Finding your address...'
+        const address = await reverseGeocode(location)
+        searchAddress.value = address
+        userLocation.value = location
+
+        // Directly search places with the coordinates (skip geocoding)
+        searched.value = true
+        clearMarkers()
+
+        // Center map on the location
+        map.setView([location.lat, location.lng], 14)
+
+        // Add user location marker
+        L.marker([location.lat, location.lng], {
+          icon: L.divIcon({
+            className: 'user-marker',
+            html: '📍',
+            iconSize: [30, 30]
+          })
+        }).addTo(map).bindPopup('Your Location')
+
+        // Search for places
+        loadingMessage.value = `Searching for nearby ${getCategoryName().toLowerCase()}...`
+        const foundPlaces = await searchNearbyPlaces(location, selectedCategory.value)
+        places.value = foundPlaces
+
+        // Add markers for each place
+        foundPlaces.forEach(place => {
+          const categoryIcon = categories[place.category]?.icon || '📍'
+          const categoryColor = categories[place.category]?.color || '#3b82f6'
+
+          const marker = L.marker([place.lat, place.lng], {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: `<div class="marker-pin" style="background-color: ${categoryColor}">${categoryIcon}</div>`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 40]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="popup-content">
+                <h3>${categoryIcon} ${place.name}</h3>
+                <p>${place.address}</p>
+                <p><strong>${place.distance} km away</strong></p>
+              </div>
+            `)
+          markers.push(marker)
+        })
+
+        loading.value = false
+      } catch (error) {
+        console.error('Error using current location:', error)
+        alert('Error finding nearby places. Please try again.')
+        loading.value = false
       }
-
-      // Reverse geocode to get address
-      loadingMessage.value = 'Finding your address...'
-      const address = await reverseGeocode(location)
-      searchAddress.value = address
-      userLocation.value = location
-
-      await searchPlaces()
     },
     (error) => {
       console.error('Error getting location:', error)
@@ -383,7 +434,7 @@ async function searchNearbyPlaces(location, category) {
     }
 
     // Process results
-    const results = data.elements
+    let results = data.elements
       .filter(element => element.tags && element.tags.name)
       .map(element => {
         // For ways, use center coordinates
@@ -407,12 +458,30 @@ async function searchNearbyPlaces(location, category) {
           address: formatAddress(element.tags),
           category: category,
           distance: distance.toFixed(2),
-          tags: element.tags
+          tags: element.tags,
+          needsGeocoding: !hasValidAddress(element.tags) // Flag if address is incomplete
         }
       })
       .filter(result => result !== null) // Remove invalid results
       .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
       .slice(0, 20) // Limit to 20 results
+
+    // Enhance addresses with reverse geocoding for places without proper addresses
+    // Only do this for top 10 results to avoid rate limiting
+    const topResults = results.slice(0, 10)
+    for (const result of topResults) {
+      if (result.needsGeocoding) {
+        try {
+          const geocodedAddress = await reverseGeocodeSimple({ lat: result.lat, lng: result.lng })
+          if (geocodedAddress && geocodedAddress !== 'Unknown location') {
+            result.address = geocodedAddress
+          }
+        } catch (error) {
+          console.warn(`Failed to geocode address for ${result.name}:`, error)
+        }
+      }
+      delete result.needsGeocoding // Clean up the flag
+    }
 
     console.log(`Found ${results.length} places for category: ${category}`)
     return results
@@ -422,13 +491,89 @@ async function searchNearbyPlaces(location, category) {
   }
 }
 
+function hasValidAddress(tags) {
+  // Check if the place has a valid address
+  return !!(
+    tags['addr:street'] ||
+    tags['addr:housenumber'] ||
+    tags['addr:suburb'] ||
+    tags.street ||
+    tags.road
+  )
+}
+
 function formatAddress(tags) {
   const parts = []
-  if (tags['addr:street']) parts.push(tags['addr:street'])
+
+  // Try structured address first
+  if (tags['addr:housenumber'] && tags['addr:street']) {
+    parts.push(`${tags['addr:housenumber']} ${tags['addr:street']}`)
+  } else if (tags['addr:street']) {
+    parts.push(tags['addr:street'])
+  }
+
   if (tags['addr:suburb']) parts.push(tags['addr:suburb'])
+  if (tags['addr:city']) parts.push(tags['addr:city'])
   if (tags['addr:postcode']) parts.push(tags['addr:postcode'])
 
-  return parts.length > 0 ? parts.join(', ') : 'Address not available'
+  // If no structured address, try other fields
+  if (parts.length === 0) {
+    // Try street, road, or location description
+    if (tags.street) parts.push(tags.street)
+    if (tags.road) parts.push(tags.road)
+
+    // Add suburb/city info if available
+    const location = tags.suburb || tags.city || tags.town || tags.village
+    if (location) parts.push(location)
+
+    // Add state/postcode if available
+    if (tags.postcode) parts.push(tags.postcode)
+    if (tags['addr:state']) parts.push(tags['addr:state'])
+  }
+
+  // If still no address info, return a helpful message with distance
+  return parts.length > 0 ? parts.join(', ') : 'Near Clayton, VIC'
+}
+
+async function reverseGeocodeSimple(location) {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`,
+      {
+        headers: {
+          'User-Agent': 'NutritionEducationApp/1.0'
+        }
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Reverse geocoding failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // Build a simple address from the components
+    const addr = data.address || {}
+    const parts = []
+
+    if (addr.house_number && addr.road) {
+      parts.push(`${addr.house_number} ${addr.road}`)
+    } else if (addr.road) {
+      parts.push(addr.road)
+    }
+
+    if (addr.suburb) parts.push(addr.suburb)
+    else if (addr.neighbourhood) parts.push(addr.neighbourhood)
+
+    if (addr.postcode) parts.push(addr.postcode)
+
+    return parts.length > 0 ? parts.join(', ') : 'Near Clayton, VIC'
+  } catch (error) {
+    console.error('Reverse geocoding error:', error)
+    return 'Near Clayton, VIC'
+  }
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
