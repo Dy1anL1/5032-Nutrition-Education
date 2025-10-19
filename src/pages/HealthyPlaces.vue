@@ -69,9 +69,7 @@
             <h3>{{ place.name }}</h3>
             <p class="place-address">{{ place.address }}</p>
             <p class="place-distance">{{ place.distance }} km away</p>
-            <button @click.stop="showRoute(place)" class="route-btn">
-              Get Directions
-            </button>
+            <button @click.stop="showRoute(place)" class="route-btn">Get Directions</button>
           </div>
         </div>
       </div>
@@ -111,16 +109,22 @@ const categories = {
     amenityTypes: ['restaurant', 'cafe', 'fast_food'],
     leisureTypes: [],
     shopTypes: [],
-    keywords: ['healthy', 'organic', 'vegan', 'vegetarian', 'salad']
+    keywords: ['healthy', 'organic', 'vegan', 'vegetarian', 'salad'],
   },
   gym: {
     name: 'Gyms & Fitness Centers',
     icon: '💪',
     color: '#8b5cf6', // purple
     amenityTypes: ['gym', 'fitness_centre', 'sports_centre', 'fitness_center', 'sports_center'],
-    leisureTypes: ['fitness_centre', 'sports_centre', 'fitness_station', 'sports_center', 'fitness_center'],
+    leisureTypes: [
+      'fitness_centre',
+      'sports_centre',
+      'fitness_station',
+      'sports_center',
+      'fitness_center',
+    ],
     shopTypes: ['sports'],
-    keywords: ['gym', 'fitness', 'yoga', 'pilates']
+    keywords: ['gym', 'fitness', 'yoga', 'pilates'],
   },
   supermarket: {
     name: 'Supermarkets & Organic Stores',
@@ -129,8 +133,8 @@ const categories = {
     amenityTypes: ['marketplace'],
     leisureTypes: [],
     shopTypes: ['supermarket', 'convenience', 'greengrocer', 'organic'],
-    keywords: ['coles', 'woolworths', 'aldi', 'iga', 'organic']
-  }
+    keywords: ['coles', 'woolworths', 'aldi', 'iga', 'organic'],
+  },
 }
 
 onMounted(() => {
@@ -150,8 +154,32 @@ function initMap() {
   // Add OpenStreetMap tiles
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
+    maxZoom: 19,
   }).addTo(map)
+
+  // Add custom locate control button (Google Maps style)
+  const locateControl = L.control({ position: 'topleft' })
+
+  locateControl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-locate')
+    div.innerHTML = `
+      <a class="leaflet-control-locate-btn" href="#" title="Show my location" role="button" aria-label="Show my location">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,13H1V11H3.05C3.5,6.83 6.83,3.5 11,3.05V1H13V3.05C17.17,3.5 20.5,6.83 20.95,11H23V13H20.95C20.5,17.17 17.17,20.5 13,20.95V23H11V20.95C6.83,20.5 3.5,17.17 3.05,13M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5Z"/>
+        </svg>
+      </a>
+    `
+
+    div.querySelector('.leaflet-control-locate-btn').onclick = function (e) {
+      L.DomEvent.stopPropagation(e)
+      L.DomEvent.preventDefault(e)
+      recenterMap()
+    }
+
+    return div
+  }
+
+  locateControl.addTo(map)
 
   // Add a marker for default location
   const defaultMarker = L.marker([-37.9105, 145.1362])
@@ -185,9 +213,11 @@ async function searchPlaces() {
       icon: L.divIcon({
         className: 'user-marker',
         html: '📍',
-        iconSize: [30, 30]
-      })
-    }).addTo(map).bindPopup('Your Location')
+        iconSize: [30, 30],
+      }),
+    })
+      .addTo(map)
+      .bindPopup('Your Location')
 
     // Search for places using Overpass API (OpenStreetMap)
     loadingMessage.value = `Searching for nearby ${getCategoryName().toLowerCase()}...`
@@ -195,7 +225,7 @@ async function searchPlaces() {
     places.value = foundPlaces
 
     // Add markers for each place
-    foundPlaces.forEach(place => {
+    foundPlaces.forEach((place) => {
       const categoryIcon = categories[place.category]?.icon || '📍'
       const categoryColor = categories[place.category]?.color || '#3b82f6'
 
@@ -204,11 +234,9 @@ async function searchPlaces() {
           className: 'custom-marker',
           html: `<div class="marker-pin" style="background-color: ${categoryColor}">${categoryIcon}</div>`,
           iconSize: [40, 40],
-          iconAnchor: [20, 40]
-        })
-      })
-        .addTo(map)
-        .bindPopup(`
+          iconAnchor: [20, 40],
+        }),
+      }).addTo(map).bindPopup(`
           <div class="popup-content">
             <h3>${categoryIcon} ${place.name}</h3>
             <p>${place.address}</p>
@@ -217,12 +245,22 @@ async function searchPlaces() {
         `)
       markers.push(marker)
     })
-
   } catch (error) {
     console.error('Error searching places:', error)
     alert('Error searching for places. Please try again.')
   } finally {
     loading.value = false
+  }
+}
+
+// Recenter map to current/last searched location
+function recenterMap() {
+  if (userLocation.value) {
+    // If we have a saved location (from search or GPS), center on it
+    map.setView([userLocation.value.lat, userLocation.value.lng], 14)
+  } else {
+    // If no saved location, use default (Monash Clayton)
+    map.setView([-37.9105, 145.1362], 13)
   }
 }
 
@@ -240,7 +278,7 @@ async function useCurrentLocation() {
       try {
         const location = {
           lat: position.coords.latitude,
-          lng: position.coords.longitude
+          lng: position.coords.longitude,
         }
 
         // Reverse geocode to get address for display
@@ -261,9 +299,11 @@ async function useCurrentLocation() {
           icon: L.divIcon({
             className: 'user-marker',
             html: '📍',
-            iconSize: [30, 30]
-          })
-        }).addTo(map).bindPopup('Your Location')
+            iconSize: [30, 30],
+          }),
+        })
+          .addTo(map)
+          .bindPopup('Your Location')
 
         // Search for places
         loadingMessage.value = `Searching for nearby ${getCategoryName().toLowerCase()}...`
@@ -271,7 +311,7 @@ async function useCurrentLocation() {
         places.value = foundPlaces
 
         // Add markers for each place
-        foundPlaces.forEach(place => {
+        foundPlaces.forEach((place) => {
           const categoryIcon = categories[place.category]?.icon || '📍'
           const categoryColor = categories[place.category]?.color || '#3b82f6'
 
@@ -280,11 +320,9 @@ async function useCurrentLocation() {
               className: 'custom-marker',
               html: `<div class="marker-pin" style="background-color: ${categoryColor}">${categoryIcon}</div>`,
               iconSize: [40, 40],
-              iconAnchor: [20, 40]
-            })
-          })
-            .addTo(map)
-            .bindPopup(`
+              iconAnchor: [20, 40],
+            }),
+          }).addTo(map).bindPopup(`
               <div class="popup-content">
                 <h3>${categoryIcon} ${place.name}</h3>
                 <p>${place.address}</p>
@@ -305,7 +343,7 @@ async function useCurrentLocation() {
       console.error('Error getting location:', error)
       alert('Could not get your location. Please enter an address manually.')
       loading.value = false
-    }
+    },
   )
 }
 
@@ -313,15 +351,15 @@ async function geocodeAddress(address) {
   try {
     // Use Nominatim (OpenStreetMap) for geocoding
     // Add delay to respect rate limiting (max 1 request per second)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
       {
         headers: {
-          'User-Agent': 'NutritionEducationApp/1.0'
-        }
-      }
+          'User-Agent': 'NutritionEducationApp/1.0',
+        },
+      },
     )
 
     if (!response.ok) {
@@ -334,7 +372,7 @@ async function geocodeAddress(address) {
     if (data && data.length > 0) {
       return {
         lat: parseFloat(data[0].lat),
-        lng: parseFloat(data[0].lon)
+        lng: parseFloat(data[0].lon),
       }
     } else {
       throw new Error(`Could not find location: "${address}". Try "Clayton VIC 3800, Australia"`)
@@ -347,15 +385,15 @@ async function geocodeAddress(address) {
 
 async function reverseGeocode(location) {
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`,
       {
         headers: {
-          'User-Agent': 'NutritionEducationApp/1.0'
-        }
-      }
+          'User-Agent': 'NutritionEducationApp/1.0',
+        },
+      },
     )
 
     if (!response.ok) {
@@ -376,29 +414,29 @@ async function searchNearbyPlaces(location, category) {
   const categoryConfig = categories[category]
 
   // Build Overpass query - search both nodes AND ways
-  const amenityNodeQueries = categoryConfig.amenityTypes.map(type =>
-    `node["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const amenityNodeQueries = categoryConfig.amenityTypes
+    .map((type) => `node["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
-  const amenityWayQueries = categoryConfig.amenityTypes.map(type =>
-    `way["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const amenityWayQueries = categoryConfig.amenityTypes
+    .map((type) => `way["amenity"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
-  const leisureNodeQueries = categoryConfig.leisureTypes.map(type =>
-    `node["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const leisureNodeQueries = categoryConfig.leisureTypes
+    .map((type) => `node["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
-  const leisureWayQueries = categoryConfig.leisureTypes.map(type =>
-    `way["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const leisureWayQueries = categoryConfig.leisureTypes
+    .map((type) => `way["leisure"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
-  const shopNodeQueries = categoryConfig.shopTypes.map(type =>
-    `node["shop"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const shopNodeQueries = categoryConfig.shopTypes
+    .map((type) => `node["shop"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
-  const shopWayQueries = categoryConfig.shopTypes.map(type =>
-    `way["shop"="${type}"](around:${radius},${location.lat},${location.lng});`
-  ).join('')
+  const shopWayQueries = categoryConfig.shopTypes
+    .map((type) => `way["shop"="${type}"](around:${radius},${location.lat},${location.lng});`)
+    .join('')
 
   const query = `
     [out:json][timeout:25];
@@ -418,7 +456,7 @@ async function searchNearbyPlaces(location, category) {
   try {
     const response = await fetch('https://overpass-api.de/api/interpreter', {
       method: 'POST',
-      body: query
+      body: query,
     })
 
     if (!response.ok) {
@@ -435,8 +473,8 @@ async function searchNearbyPlaces(location, category) {
 
     // Process results
     let results = data.elements
-      .filter(element => element.tags && element.tags.name)
-      .map(element => {
+      .filter((element) => element.tags && element.tags.name)
+      .map((element) => {
         // For ways, use center coordinates
         const lat = element.lat || element.center?.lat
         const lon = element.lon || element.center?.lon
@@ -446,10 +484,7 @@ async function searchNearbyPlaces(location, category) {
           return null
         }
 
-        const distance = calculateDistance(
-          location.lat, location.lng,
-          lat, lon
-        )
+        const distance = calculateDistance(location.lat, location.lng, lat, lon)
 
         return {
           name: element.tags.name,
@@ -459,10 +494,10 @@ async function searchNearbyPlaces(location, category) {
           category: category,
           distance: distance.toFixed(2),
           tags: element.tags,
-          needsGeocoding: !hasValidAddress(element.tags) // Flag if address is incomplete
+          needsGeocoding: !hasValidAddress(element.tags), // Flag if address is incomplete
         }
       })
-      .filter(result => result !== null) // Remove invalid results
+      .filter((result) => result !== null) // Remove invalid results
       .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
       .slice(0, 20) // Limit to 20 results
 
@@ -537,15 +572,15 @@ function formatAddress(tags) {
 
 async function reverseGeocodeSimple(location) {
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`,
       {
         headers: {
-          'User-Agent': 'NutritionEducationApp/1.0'
-        }
-      }
+          'User-Agent': 'NutritionEducationApp/1.0',
+        },
+      },
     )
 
     if (!response.ok) {
@@ -579,13 +614,15 @@ async function reverseGeocodeSimple(location) {
 function calculateDistance(lat1, lon1, lat2, lon2) {
   // Haversine formula
   const R = 6371 // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLon = (lon2 - lon1) * Math.PI / 180
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
   const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return R * c
 }
 
@@ -602,14 +639,17 @@ function showRoute(place) {
 
   // Draw a simple straight line (for demonstration)
   // In production, you'd use a routing API like OSRM
-  routePolyline = L.polyline([
-    [userLocation.value.lat, userLocation.value.lng],
-    [place.lat, place.lng]
-  ], {
-    color: '#22c55e',
-    weight: 4,
-    opacity: 0.7
-  }).addTo(map)
+  routePolyline = L.polyline(
+    [
+      [userLocation.value.lat, userLocation.value.lng],
+      [place.lat, place.lng],
+    ],
+    {
+      color: '#22c55e',
+      weight: 4,
+      opacity: 0.7,
+    },
+  ).addTo(map)
 
   // Fit map to show both points
   map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] })
@@ -617,13 +657,15 @@ function showRoute(place) {
   // Show popup with route info
   const popup = L.popup()
     .setLatLng([place.lat, place.lng])
-    .setContent(`
+    .setContent(
+      `
       <div class="popup-content">
         <h3>Route to ${place.name}</h3>
         <p>Distance: ${place.distance} km</p>
         <p><a href="https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}" target="_blank">Open in Google Maps</a></p>
       </div>
-    `)
+    `,
+    )
     .openOn(map)
 }
 
@@ -631,7 +673,7 @@ function showPlaceDetails(place) {
   map.setView([place.lat, place.lng], 16)
 
   // Find and open the marker popup
-  markers.forEach(marker => {
+  markers.forEach((marker) => {
     const markerPos = marker.getLatLng()
     if (markerPos.lat === place.lat && markerPos.lng === place.lng) {
       marker.openPopup()
@@ -640,7 +682,7 @@ function showPlaceDetails(place) {
 }
 
 function clearMarkers() {
-  markers.forEach(marker => map.removeLayer(marker))
+  markers.forEach((marker) => map.removeLayer(marker))
   markers = []
   if (routePolyline) {
     map.removeLayer(routePolyline)
@@ -764,6 +806,37 @@ function getCategoryName() {
   cursor: not-allowed;
 }
 
+/* Map locate button - Google Maps style */
+.leaflet-control-locate {
+  margin-top: 80px !important; /* Position below zoom controls */
+}
+
+.leaflet-control-locate-btn {
+  width: 30px;
+  height: 30px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.leaflet-control-locate-btn:hover {
+  background: #f4f4f4;
+  color: #333;
+}
+
+.leaflet-control-locate-btn:active {
+  background: #e8e8e8;
+}
+
+.leaflet-control-locate-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
 .map-container {
   position: relative;
   height: 500px;
@@ -805,7 +878,9 @@ function getCategoryName() {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -817,8 +892,13 @@ function getCategoryName() {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .results {
