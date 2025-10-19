@@ -14,6 +14,13 @@
   <!-- Email Test Modal -->
   <EmailTestModal :show="showEmailTestModal" @close="showEmailTestModal = false" />
 
+  <!-- Bulk Email Modal -->
+  <BulkEmailModal
+    :show="showBulkEmailModal"
+    :recipients="selectedUserEmails"
+    @close="showBulkEmailModal = false"
+  />
+
   <div class="admin-content">
     <!-- Quick Stats -->
     <section class="stats-section">
@@ -42,13 +49,54 @@
       </div>
     </section>
 
+    <!-- Analytics & Insights - Interactive Charts -->
+    <section class="charts-section">
+      <h2>Analytics & Insights</h2>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>User Role Distribution</h3>
+          <div class="chart-container">
+            <Doughnut :data="userRoleChartData" :options="chartOptions" />
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Rating Distribution</h3>
+          <div class="chart-container">
+            <Bar :data="ratingDistributionData" :options="barChartOptions" />
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Recipe Categories</h3>
+          <div class="chart-container">
+            <Pie :data="recipeCategoryData" :options="chartOptions" />
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>User Growth (Last 7 Days)</h3>
+          <div class="chart-container">
+            <Line :data="userGrowthData" :options="lineChartOptions" />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- User Management - Interactive Table 1 -->
     <section class="management-section">
       <div class="section-header">
         <h2>User Management</h2>
-        <button @click="exportUsersToCSV" class="export-btn" title="Export users to CSV">
-          Export Users to CSV
-        </button>
+        <div class="header-actions">
+          <button
+            @click="showBulkEmailModal = true"
+            class="export-btn bulk-email-btn"
+            :disabled="selectedUsers.length === 0"
+            :title="selectedUsers.length === 0 ? 'Select users to send bulk email' : `Send email to ${selectedUsers.length} user(s)`"
+          >
+            Send Bulk Email ({{ selectedUsers.length }})
+          </button>
+          <button @click="exportUsersToCSV" class="export-btn" title="Export users to CSV">
+            Export Users to CSV
+          </button>
+        </div>
       </div>
       <Vue3EasyDataTable
         :headers="userHeaders"
@@ -59,6 +107,16 @@
         border-cell
         class="custom-data-table"
       >
+        <template #item-select="{ id }">
+          <input
+            type="checkbox"
+            :checked="selectedUsers.includes(id)"
+            @change="toggleUserSelection(id)"
+            class="user-checkbox"
+            :aria-label="`Select user ${id}`"
+          />
+        </template>
+
         <template #header-name="header">
           <div class="filter-column">
             <div>{{ header.text }}</div>
@@ -218,7 +276,36 @@ import recipesData from '../data/recipes.json'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import EmailTestModal from '../components/EmailTestModal.vue'
+import BulkEmailModal from '../components/BulkEmailModal.vue'
 import Papa from 'papaparse'
+
+// Chart.js imports
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+  PointElement,
+  LineElement
+} from 'chart.js'
+import { Bar, Doughnut, Pie, Line } from 'vue-chartjs'
+
+// Register Chart.js components
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+  PointElement,
+  LineElement
+)
 
 const authStore = useAuthStore()
 
@@ -227,9 +314,12 @@ const recipes = ref([])
 const ratings = ref([])
 const allRatings = ref([])
 const showEmailTestModal = ref(false)
+const showBulkEmailModal = ref(false)
+const selectedUsers = ref([])
 
 // Table headers for User Management
 const userHeaders = [
+  { text: 'Select', value: 'select', sortable: false },
   { text: 'Name', value: 'name', sortable: true },
   { text: 'Email', value: 'email', sortable: true },
   { text: 'Role', value: 'role', sortable: true },
@@ -316,6 +406,168 @@ const ratingStats = computed(() => ({
     ? (ratings.value.reduce((sum, r) => sum + r.rating, 0) / ratings.value.length).toFixed(1)
     : '0.0'
 }))
+
+// Chart Data - User Role Distribution
+const userRoleChartData = computed(() => {
+  const adminCount = users.value.filter(u => u.role === 'admin').length
+  const userCount = users.value.filter(u => u.role !== 'admin').length
+
+  return {
+    labels: ['Admin', 'User'],
+    datasets: [{
+      data: [adminCount, userCount],
+      backgroundColor: ['#f59e0b', '#3b82f6'],
+      borderWidth: 0
+    }]
+  }
+})
+
+// Chart Data - Rating Distribution
+const ratingDistributionData = computed(() => {
+  const distribution = [0, 0, 0, 0, 0]
+  ratings.value.forEach(r => {
+    if (r.rating >= 1 && r.rating <= 5) {
+      distribution[r.rating - 1]++
+    }
+  })
+
+  return {
+    labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+    datasets: [{
+      label: 'Number of Ratings',
+      data: distribution,
+      backgroundColor: [
+        '#ef4444',
+        '#f97316',
+        '#eab308',
+        '#84cc16',
+        '#22c55e'
+      ],
+      borderWidth: 0
+    }]
+  }
+})
+
+// Chart Data - Recipe Category Distribution
+const recipeCategoryData = computed(() => {
+  const categories = {}
+  recipes.value.forEach(r => {
+    const category = r.category || r.meal || 'Other'
+    categories[category] = (categories[category] || 0) + 1
+  })
+
+  return {
+    labels: Object.keys(categories),
+    datasets: [{
+      data: Object.values(categories),
+      backgroundColor: [
+        '#f59e0b',
+        '#3b82f6',
+        '#22c55e',
+        '#8b5cf6',
+        '#ec4899'
+      ],
+      borderWidth: 0
+    }]
+  }
+})
+
+// Chart Data - User Growth (Last 7 Days)
+const userGrowthData = computed(() => {
+  const last7Days = []
+  const today = new Date()
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    last7Days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+  }
+
+  const growthData = last7Days.map((_, index) => {
+    const date = new Date(today)
+    date.setDate(date.getDate() - (6 - index))
+    return users.value.filter(u => {
+      const userDate = new Date(u.createdAt)
+      return userDate.toDateString() === date.toDateString()
+    }).length
+  })
+
+  return {
+    labels: last7Days,
+    datasets: [{
+      label: 'New Users',
+      data: growthData,
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34, 197, 94, 0.1)',
+      tension: 0.4,
+      fill: true
+    }]
+  }
+})
+
+// Chart Options
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom'
+    }
+  }
+}
+
+const barChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1
+      }
+    }
+  }
+}
+
+const lineChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1
+      }
+    }
+  }
+}
+
+// Computed property for selected user emails
+const selectedUserEmails = computed(() => {
+  return users.value
+    .filter(user => selectedUsers.value.includes(user.id))
+    .map(user => user.email)
+})
+
+// Function to toggle user selection
+function toggleUserSelection(userId) {
+  const index = selectedUsers.value.indexOf(userId)
+  if (index > -1) {
+    selectedUsers.value.splice(index, 1)
+  } else {
+    selectedUsers.value.push(userId)
+  }
+}
 
 onMounted(async () => {
   await loadData()
@@ -477,6 +729,49 @@ function exportUsersToCSV() {
   font-size: 2rem;
   margin-bottom: 24px;
   color: #1a202c;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-bottom: 48px;
+}
+
+.charts-section h2 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #1a202c;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.chart-card h3 {
+  font-size: 1.1rem;
+  margin: 0 0 20px 0;
+  color: #374151;
+  font-weight: 600;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stats-grid {
@@ -853,5 +1148,37 @@ function exportUsersToCSV() {
 /* Add spacing between sections */
 .management-section:not(:last-child) {
   margin-bottom: 60px;
+}
+
+/* Bulk Email Styles */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bulk-email-btn {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+.bulk-email-btn:hover:not(:disabled) {
+  background: #2563eb !important;
+}
+
+.bulk-email-btn:disabled {
+  background: #9ca3af !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.user-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.user-checkbox:hover {
+  transform: scale(1.1);
 }
 </style>

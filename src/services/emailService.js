@@ -44,3 +44,43 @@ export async function sendContactEmail(contactData) {
     throw new Error(error.message || 'Failed to send contact email')
   }
 }
+
+/**
+ * Send bulk emails to multiple recipients
+ * @param {Object} bulkEmailData - Bulk email data
+ * @param {Array<string>} bulkEmailData.recipients - Array of recipient emails
+ * @param {string} bulkEmailData.subject - Email subject
+ * @param {string} bulkEmailData.text - Plain text content
+ * @param {string} bulkEmailData.html - HTML content
+ * @returns {Promise<Object>} Result object with success/failure counts
+ */
+export async function sendBulkEmail(bulkEmailData) {
+  try {
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: []
+    }
+
+    // Send emails sequentially to avoid rate limiting
+    for (const recipient of bulkEmailData.recipients) {
+      try {
+        await sendEmail({
+          to: recipient,
+          subject: bulkEmailData.subject,
+          text: bulkEmailData.text,
+          html: bulkEmailData.html
+        })
+        results.success++
+      } catch (error) {
+        results.failed++
+        results.errors.push({ email: recipient, error: error.message })
+      }
+    }
+
+    return results
+  } catch (error) {
+    console.error('Error sending bulk emails:', error)
+    throw new Error(error.message || 'Failed to send bulk emails')
+  }
+}
