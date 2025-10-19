@@ -2,7 +2,7 @@
   <div v-if="show" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Send Test Email with Attachment</h2>
+        <h2>Send Email with Attachment</h2>
         <button @click="closeModal" class="close-btn">&times;</button>
       </div>
 
@@ -42,19 +42,12 @@
 
         <div class="form-group">
           <label>Attachment (PDF):</label>
-          <input
-            type="file"
-            accept=".pdf"
-            @change="handleFileUpload"
-            class="form-input"
-          />
+          <input type="file" accept=".pdf" @change="handleFileUpload" class="form-input" />
           <small v-if="fileName">Selected: {{ fileName }}</small>
         </div>
 
         <div class="modal-footer">
-          <button type="button" @click="closeModal" class="btn-secondary">
-            Cancel
-          </button>
+          <button type="button" @click="closeModal" class="btn-secondary">Cancel</button>
           <button type="submit" :disabled="loading" class="btn-primary">
             {{ loading ? 'Sending...' : 'Send Email' }}
           </button>
@@ -159,12 +152,15 @@ async function sendTestEmail() {
 }
 
 // Clear messages when modal opens
-watch(() => props.show, (newVal) => {
-  if (newVal) {
-    successMessage.value = ''
-    errorMessage.value = ''
-  }
-})
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      successMessage.value = ''
+      errorMessage.value = ''
+    }
+  },
+)
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@
     </div>
     <div class="title-actions">
       <button @click="showEmailTestModal = true" class="btn-test-email">
-        Test Email with Attachment
+        Send Email with Attachment
       </button>
     </div>
   </section>
@@ -89,7 +89,11 @@
             @click="showBulkEmailModal = true"
             class="export-btn bulk-email-btn"
             :disabled="selectedUsers.length === 0"
-            :title="selectedUsers.length === 0 ? 'Select users to send bulk email' : `Send email to ${selectedUsers.length} user(s)`"
+            :title="
+              selectedUsers.length === 0
+                ? 'Select users to send bulk email'
+                : `Send email to ${selectedUsers.length} user(s)`
+            "
           >
             Send Bulk Email ({{ selectedUsers.length }})
           </button>
@@ -258,9 +262,7 @@
         </template>
 
         <template #item-actions="{ id }">
-          <button @click="deleteRatingById(id)" class="btn-small danger">
-            Remove
-          </button>
+          <button @click="deleteRatingById(id)" class="btn-small danger">Remove</button>
         </template>
       </Vue3EasyDataTable>
     </section>
@@ -290,7 +292,7 @@ import {
   LinearScale,
   ArcElement,
   PointElement,
-  LineElement
+  LineElement,
 } from 'chart.js'
 import { Bar, Doughnut, Pie, Line } from 'vue-chartjs'
 
@@ -304,7 +306,7 @@ ChartJS.register(
   LinearScale,
   ArcElement,
   PointElement,
-  LineElement
+  LineElement,
 )
 
 const authStore = useAuthStore()
@@ -324,7 +326,7 @@ const userHeaders = [
   { text: 'Email', value: 'email', sortable: true },
   { text: 'Role', value: 'role', sortable: true },
   { text: 'Joined Date', value: 'createdAt', sortable: true },
-  { text: 'Actions', value: 'actions', sortable: false }
+  { text: 'Actions', value: 'actions', sortable: false },
 ]
 
 // Table headers for Rating Analytics
@@ -334,7 +336,7 @@ const ratingHeaders = [
   { text: 'Rating', value: 'rating', sortable: true },
   { text: 'Comment', value: 'comment', sortable: false },
   { text: 'Date', value: 'createdAt', sortable: true },
-  { text: 'Actions', value: 'actions', sortable: false }
+  { text: 'Actions', value: 'actions', sortable: false },
 ]
 
 // Search and filter states
@@ -350,14 +352,14 @@ const filteredUsers = computed(() => {
 
   // Filter by email
   if (emailSearch.value) {
-    filtered = filtered.filter(u =>
-      u.email.toLowerCase().includes(emailSearch.value.toLowerCase())
+    filtered = filtered.filter((u) =>
+      u.email.toLowerCase().includes(emailSearch.value.toLowerCase()),
     )
   }
 
   // Filter by role
   if (roleFilter.value) {
-    filtered = filtered.filter(u => u.role === roleFilter.value)
+    filtered = filtered.filter((u) => u.role === roleFilter.value)
   }
 
   return filtered
@@ -368,21 +370,21 @@ const filteredRatings = computed(() => {
 
   // Filter by recipe name
   if (recipeNameSearch.value) {
-    filtered = filtered.filter(r =>
-      r.recipeName.toLowerCase().includes(recipeNameSearch.value.toLowerCase())
+    filtered = filtered.filter((r) =>
+      r.recipeName.toLowerCase().includes(recipeNameSearch.value.toLowerCase()),
     )
   }
 
   // Filter by user name
   if (userNameSearch.value) {
-    filtered = filtered.filter(r =>
-      r.userName.toLowerCase().includes(userNameSearch.value.toLowerCase())
+    filtered = filtered.filter((r) =>
+      r.userName.toLowerCase().includes(userNameSearch.value.toLowerCase()),
     )
   }
 
   // Filter by rating
   if (ratingFilter.value) {
-    filtered = filtered.filter(r => r.rating === parseInt(ratingFilter.value))
+    filtered = filtered.filter((r) => r.rating === parseInt(ratingFilter.value))
   }
 
   return filtered
@@ -391,41 +393,44 @@ const filteredRatings = computed(() => {
 // Computed stats
 const userStats = computed(() => ({
   total: users.value.length,
-  admins: users.value.filter(u => u.role === 'admin').length,
-  regularUsers: users.value.filter(u => u.role === 'user').length
+  admins: users.value.filter((u) => u.role === 'admin').length,
+  regularUsers: users.value.filter((u) => u.role === 'user').length,
 }))
 
 const recipeStats = computed(() => ({
   total: recipes.value.length,
-  withRatings: recipes.value.filter(r => r.ratingCount > 0).length
+  withRatings: recipes.value.filter((r) => r.ratingCount > 0).length,
 }))
 
 const ratingStats = computed(() => ({
   total: ratings.value.length,
-  average: ratings.value.length > 0
-    ? (ratings.value.reduce((sum, r) => sum + r.rating, 0) / ratings.value.length).toFixed(1)
-    : '0.0'
+  average:
+    ratings.value.length > 0
+      ? (ratings.value.reduce((sum, r) => sum + r.rating, 0) / ratings.value.length).toFixed(1)
+      : '0.0',
 }))
 
 // Chart Data - User Role Distribution
 const userRoleChartData = computed(() => {
-  const adminCount = users.value.filter(u => u.role === 'admin').length
-  const userCount = users.value.filter(u => u.role !== 'admin').length
+  const adminCount = users.value.filter((u) => u.role === 'admin').length
+  const userCount = users.value.filter((u) => u.role !== 'admin').length
 
   return {
     labels: ['Admin', 'User'],
-    datasets: [{
-      data: [adminCount, userCount],
-      backgroundColor: ['#f59e0b', '#3b82f6'],
-      borderWidth: 0
-    }]
+    datasets: [
+      {
+        data: [adminCount, userCount],
+        backgroundColor: ['#f59e0b', '#3b82f6'],
+        borderWidth: 0,
+      },
+    ],
   }
 })
 
 // Chart Data - Rating Distribution
 const ratingDistributionData = computed(() => {
   const distribution = [0, 0, 0, 0, 0]
-  ratings.value.forEach(r => {
+  ratings.value.forEach((r) => {
     if (r.rating >= 1 && r.rating <= 5) {
       distribution[r.rating - 1]++
     }
@@ -433,42 +438,34 @@ const ratingDistributionData = computed(() => {
 
   return {
     labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
-    datasets: [{
-      label: 'Number of Ratings',
-      data: distribution,
-      backgroundColor: [
-        '#ef4444',
-        '#f97316',
-        '#eab308',
-        '#84cc16',
-        '#22c55e'
-      ],
-      borderWidth: 0
-    }]
+    datasets: [
+      {
+        label: 'Number of Ratings',
+        data: distribution,
+        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'],
+        borderWidth: 0,
+      },
+    ],
   }
 })
 
 // Chart Data - Recipe Category Distribution
 const recipeCategoryData = computed(() => {
   const categories = {}
-  recipes.value.forEach(r => {
+  recipes.value.forEach((r) => {
     const category = r.category || r.meal || 'Other'
     categories[category] = (categories[category] || 0) + 1
   })
 
   return {
     labels: Object.keys(categories),
-    datasets: [{
-      data: Object.values(categories),
-      backgroundColor: [
-        '#f59e0b',
-        '#3b82f6',
-        '#22c55e',
-        '#8b5cf6',
-        '#ec4899'
-      ],
-      borderWidth: 0
-    }]
+    datasets: [
+      {
+        data: Object.values(categories),
+        backgroundColor: ['#f59e0b', '#3b82f6', '#22c55e', '#8b5cf6', '#ec4899'],
+        borderWidth: 0,
+      },
+    ],
   }
 })
 
@@ -486,7 +483,7 @@ const userGrowthData = computed(() => {
   const growthData = last7Days.map((_, index) => {
     const date = new Date(today)
     date.setDate(date.getDate() - (6 - index))
-    return users.value.filter(u => {
+    return users.value.filter((u) => {
       const userDate = new Date(u.createdAt)
       return userDate.toDateString() === date.toDateString()
     }).length
@@ -494,14 +491,16 @@ const userGrowthData = computed(() => {
 
   return {
     labels: last7Days,
-    datasets: [{
-      label: 'New Users',
-      data: growthData,
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      tension: 0.4,
-      fill: true
-    }]
+    datasets: [
+      {
+        label: 'New Users',
+        data: growthData,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.4,
+        fill: true,
+      },
+    ],
   }
 })
 
@@ -511,9 +510,9 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'bottom'
-    }
-  }
+      position: 'bottom',
+    },
+  },
 }
 
 const barChartOptions = {
@@ -521,17 +520,17 @@ const barChartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
-    }
+      display: false,
+    },
   },
   scales: {
     y: {
       beginAtZero: true,
       ticks: {
-        stepSize: 1
-      }
-    }
-  }
+        stepSize: 1,
+      },
+    },
+  },
 }
 
 const lineChartOptions = {
@@ -539,24 +538,24 @@ const lineChartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
-    }
+      display: false,
+    },
   },
   scales: {
     y: {
       beginAtZero: true,
       ticks: {
-        stepSize: 1
-      }
-    }
-  }
+        stepSize: 1,
+      },
+    },
+  },
 }
 
 // Computed property for selected user emails
 const selectedUserEmails = computed(() => {
   return users.value
-    .filter(user => selectedUsers.value.includes(user.id))
-    .map(user => user.email)
+    .filter((user) => selectedUsers.value.includes(user.id))
+    .map((user) => user.email)
 })
 
 // Function to toggle user selection
@@ -577,10 +576,10 @@ async function loadData() {
   try {
     // Load users
     const usersSnapshot = await getDocs(collection(db, 'users'))
-    users.value = usersSnapshot.docs.map(doc => ({
+    users.value = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date()
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
     }))
 
     // Load recipes from local data (since they're not in Firestore)
@@ -588,7 +587,7 @@ async function loadData() {
 
     // Load all ratings with full details
     const allRatingsSnapshot = await getDocs(collection(db, 'ratings'))
-    allRatings.value = allRatingsSnapshot.docs.map(doc => {
+    allRatings.value = allRatingsSnapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -596,13 +595,12 @@ async function loadData() {
         userName: data.userName || 'Anonymous',
         rating: data.rating || 0,
         comment: data.comment || '',
-        createdAt: data.createdAt?.toDate() || new Date()
+        createdAt: data.createdAt?.toDate() || new Date(),
       }
     })
 
     // Get all ratings for stats
     ratings.value = allRatings.value
-
   } catch (error) {
     console.error('Error loading admin data:', error)
   }
@@ -615,7 +613,7 @@ async function toggleUserRoleById(userId, currentRole) {
     await updateDoc(doc(db, 'users', userId), { role: newRole })
 
     // Update local data
-    const userIndex = users.value.findIndex(u => u.id === userId)
+    const userIndex = users.value.findIndex((u) => u.id === userId)
     if (userIndex !== -1) {
       users.value[userIndex].role = newRole
     }
@@ -628,12 +626,12 @@ async function toggleUserRoleById(userId, currentRole) {
 }
 
 async function deleteUserById(userId) {
-  const user = users.value.find(u => u.id === userId)
+  const user = users.value.find((u) => u.id === userId)
   if (!confirm(`Are you sure you want to delete user ${user?.name || 'this user'}?`)) return
 
   try {
     await deleteDoc(doc(db, 'users', userId))
-    users.value = users.value.filter(u => u.id !== userId)
+    users.value = users.value.filter((u) => u.id !== userId)
     alert('User deleted successfully')
   } catch (error) {
     console.error('Error deleting user:', error)
@@ -647,8 +645,8 @@ function editRecipe(recipe) {
 
 function deleteRecipe(recipe) {
   if (!confirm(`Are you sure you want to delete recipe "${recipe.name}"?`)) return
-  
-  recipes.value = recipes.value.filter(r => r.id !== recipe.id)
+
+  recipes.value = recipes.value.filter((r) => r.id !== recipe.id)
   alert('Recipe deleted successfully (local only - would need backend implementation)')
 }
 
@@ -658,7 +656,7 @@ async function deleteRatingById(ratingId) {
 
   try {
     await deleteDoc(doc(db, 'ratings', ratingId))
-    allRatings.value = allRatings.value.filter(r => r.id !== ratingId)
+    allRatings.value = allRatings.value.filter((r) => r.id !== ratingId)
     ratings.value = allRatings.value
     alert('Rating deleted successfully')
   } catch (error) {

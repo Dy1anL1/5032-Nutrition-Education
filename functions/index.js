@@ -340,3 +340,184 @@ exports.sendContactEmail = functions.https.onCall(async (data) => {
     throw new functions.https.HttpsError('internal', 'Failed to send contact email: ' + error.message);
   }
 });
+
+/**
+ * PUBLIC REST API - Get all recipes
+ * HTTP GET endpoint: /api/recipes
+ * Supports query parameters:
+ * - category: filter by category (e.g., breakfast, lunch, dinner)
+ * - maxCalories: filter recipes with calories <= this value
+ * - minProtein: filter recipes with protein >= this value
+ */
+exports.getRecipes = functions.https.onRequest(async (req, res) => {
+  // Set CORS headers
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    console.log('getRecipes API called with query:', req.query);
+
+    // Get query parameters
+    const { category, maxCalories, minProtein, limit = 100 } = req.query;
+
+    // Fetch recipes from Firestore
+    const recipesRef = admin.firestore().collection('recipes');
+    let query = recipesRef;
+
+    // Apply category filter if provided
+    if (category) {
+      query = query.where('category', '==', category.toLowerCase());
+    }
+
+    // Get recipes
+    const snapshot = await query.limit(parseInt(limit)).get();
+
+    let recipes = [];
+    snapshot.forEach(doc => {
+      recipes.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    // Apply nutrition filters (done in memory since Firestore doesn't support multiple range queries)
+    if (maxCalories) {
+      recipes = recipes.filter(r => (r.nutrition?.kcal || 0) <= parseInt(maxCalories));
+    }
+
+    if (minProtein) {
+      recipes = recipes.filter(r => (r.nutrition?.protein || 0) >= parseInt(minProtein));
+    }
+
+    // Return response
+    res.status(200).json({
+      success: true,
+      count: recipes.length,
+      data: recipes,
+      filters: {
+        category: category || 'all',
+        maxCalories: maxCalories || 'none',
+        minProtein: minProtein || 'none'
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`Returned ${recipes.length} recipes`);
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * PUBLIC REST API - Get recipe by ID
+ * HTTP GET endpoint: /api/recipes/:id
+ * Returns detailed information about a specific recipe
+ */
+exports.getRecipeById = functions.https.onRequest(async (req, res) => {
+  // Set CORS headers
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    // Get recipe ID from path (format: /api/recipes/RECIPE_ID)
+    const pathParts = req.path.split('/');
+    const recipeId = pathParts[pathParts.length - 1];
+
+    console.log('getRecipeById API called for ID:', recipeId);
+
+    if (!recipeId) {
+      res.status(400).json({
+        success: false,
+        error: 'Recipe ID is required'
+      });
+      return;
+    }
+
+    // Fetch recipe from Firestore
+    const recipeDoc = await admin.firestore().collection('recipes').doc(recipeId).get();
+
+    if (!recipeDoc.exists) {
+      res.status(404).json({
+        success: false,
+        error: 'Recipe not found',
+        id: recipeId
+      });
+      return;
+    }
+
+    // Get recipe ratings
+    const ratingsSnapshot = await admin.firestore()
+      .collection('ratings')
+      .where('recipeId', '==', recipeId)
+      .get();
+
+    const ratings = [];
+    let totalRating = 0;
+    ratingsSnapshot.forEach(doc => {
+      const rating = doc.data();
+      ratings.push({
+        rating: rating.rating,
+        comment: rating.comment,
+        createdAt: rating.createdAt?.toDate?.() || null
+      });
+      totalRating += rating.rating || 0;
+    });
+
+    const averageRating = ratings.length > 0 ? (totalRating / ratings.length).toFixed(1) : 0;
+
+    // Return response with recipe and ratings
+    res.status(200).json({
+      success: true,
+      data: {
+        id: recipeDoc.id,
+        ...recipeDoc.data(),
+        ratings: {
+          average: parseFloat(averageRating),
+          count: ratings.length,
+          reviews: ratings
+        }
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`Returned recipe ${recipeId} with ${ratings.length} ratings`);
+  } catch (error) {
+    console.error('Error fetching recipe:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
