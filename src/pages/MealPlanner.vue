@@ -14,6 +14,9 @@
           <button @click="previousPlan" class="nav-btn">&lt;</button>
           <h2>{{ planDisplay }}</h2>
           <button @click="nextPlan" class="nav-btn">&gt;</button>
+          <button @click="calculateNutrition" class="calculate-btn" :disabled="isCalculating" title="Calculate nutrition statistics using Cloud Function">
+            {{ isCalculating ? 'Calculating...' : 'Calculate Nutrition' }}
+          </button>
           <button @click="exportToPDF" class="export-btn" title="Export meal plan to PDF">
             Export to PDF
           </button>
@@ -100,6 +103,85 @@
         </div>
       </div>
 
+      <!-- Nutrition Statistics Modal -->
+      <div v-if="showNutritionStats && nutritionStats" class="modal-overlay" @click="closeNutritionStats">
+        <div class="modal-content nutrition-modal" @click.stop>
+          <div class="modal-header">
+            <h3>Nutrition Statistics (Cloud Function Result)</h3>
+            <button @click="closeNutritionStats" class="close-btn">×</button>
+          </div>
+
+          <div class="nutrition-stats-content">
+            <div class="stats-info">
+              <p class="stats-meta">
+                <strong>Recipes Analyzed:</strong> {{ nutritionStats.recipesAnalyzed }} meals<br>
+                <strong>Calculated:</strong> {{ new Date(nutritionStats.timestamp).toLocaleString() }}
+              </p>
+            </div>
+
+            <div class="stats-section">
+              <h4>Total Nutrition (All Meals)</h4>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-label">Calories</div>
+                  <div class="stat-value">{{ nutritionStats.total.calories }}</div>
+                  <div class="stat-unit">kcal</div>
+                  <div class="stat-percentage">{{ nutritionStats.percentages.calories }}% of daily</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Protein</div>
+                  <div class="stat-value">{{ nutritionStats.total.protein }}</div>
+                  <div class="stat-unit">g</div>
+                  <div class="stat-percentage">{{ nutritionStats.percentages.protein }}% of daily</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Carbs</div>
+                  <div class="stat-value">{{ nutritionStats.total.carbs }}</div>
+                  <div class="stat-unit">g</div>
+                  <div class="stat-percentage">{{ nutritionStats.percentages.carbs }}% of daily</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Fat</div>
+                  <div class="stat-value">{{ nutritionStats.total.fat }}</div>
+                  <div class="stat-unit">g</div>
+                  <div class="stat-percentage">{{ nutritionStats.percentages.fat }}% of daily</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-section">
+              <h4>Average Per Meal</h4>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-label">Calories</div>
+                  <div class="stat-value">{{ nutritionStats.average.calories }}</div>
+                  <div class="stat-unit">kcal</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Protein</div>
+                  <div class="stat-value">{{ nutritionStats.average.protein }}</div>
+                  <div class="stat-unit">g</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Carbs</div>
+                  <div class="stat-value">{{ nutritionStats.average.carbs }}</div>
+                  <div class="stat-unit">g</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Fat</div>
+                  <div class="stat-value">{{ nutritionStats.average.fat }}</div>
+                  <div class="stat-unit">g</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="daily-recommendations">
+              <p><small>* Percentages based on a 2000 calorie diet: 50g protein, 300g carbs, 70g fat</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Shopping List Section -->
       <div class="shopping-section">
         <h2>Shopping List</h2>
@@ -128,6 +210,7 @@
 import { ref, computed, onMounted } from 'vue'
 import recipes from '../data/recipes.json'
 import { jsPDF } from 'jspdf'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 
 const weekdays = ['Day 1', 'Day 2', 'Day 3']
 const meals = ['Breakfast', 'Lunch', 'Dinner']
@@ -140,6 +223,9 @@ const selectedDay = ref('')
 const selectedMeal = ref('')
 const selectedTag = ref('')
 const shoppingList = ref([])
+const nutritionStats = ref(null)
+const isCalculating = ref(false)
+const showNutritionStats = ref(false)
 
 // Initialize current week to Monday
 onMounted(() => {
@@ -242,6 +328,58 @@ const clearShoppingList = () => {
 
 const formatTag = (tag) => {
   return tag.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+}
+
+// Calculate nutrition statistics using Cloud Function
+const calculateNutrition = async () => {
+  const weekKey = currentWeekStart.value.toISOString().split('T')[0]
+  const currentPlan = weekPlan.value[weekKey]
+
+  if (!currentPlan || Object.keys(currentPlan).length === 0) {
+    alert('No meals planned for this period. Please add some meals first.')
+    return
+  }
+
+  // Collect all recipes from the current plan
+  const plannedRecipes = []
+  weekdays.forEach((day) => {
+    meals.forEach((meal) => {
+      const recipe = getMealForDay(day, meal)
+      if (recipe) {
+        plannedRecipes.push(recipe)
+      }
+    })
+  })
+
+  if (plannedRecipes.length === 0) {
+    alert('No meals planned for this period.')
+    return
+  }
+
+  try {
+    isCalculating.value = true
+
+    // Call Firebase Cloud Function
+    const functions = getFunctions()
+    const calculateNutritionStats = httpsCallable(functions, 'calculateNutritionStats')
+
+    const result = await calculateNutritionStats({ recipes: plannedRecipes })
+
+    if (result.data.success) {
+      nutritionStats.value = result.data.data
+      showNutritionStats.value = true
+      console.log('Nutrition stats calculated:', nutritionStats.value)
+    }
+  } catch (error) {
+    console.error('Error calculating nutrition stats:', error)
+    alert('Failed to calculate nutrition statistics. Please try again.')
+  } finally {
+    isCalculating.value = false
+  }
+}
+
+const closeNutritionStats = () => {
+  showNutritionStats.value = false
 }
 
 // Export to PDF
@@ -411,6 +549,28 @@ const exportToPDF = () => {
 
 .nav-btn:hover {
   background: #16a34a;
+}
+
+.calculate-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-left: 8px;
+}
+
+.calculate-btn:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
+.calculate-btn:disabled {
+  background: #a78bfa;
+  cursor: not-allowed;
 }
 
 .export-btn {
@@ -728,6 +888,95 @@ const exportToPDF = () => {
 
 .ingredient-item:has(.ingredient-checkbox:checked) label {
   text-decoration: line-through;
+  color: #64748b;
+}
+
+/* Nutrition Statistics Modal */
+.nutrition-modal {
+  max-width: 800px;
+}
+
+.nutrition-stats-content {
+  margin-top: 20px;
+}
+
+.stats-info {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.stats-meta {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.stats-section {
+  margin-bottom: 32px;
+}
+
+.stats-section h4 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.1);
+}
+
+.stat-label {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-unit {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.stat-percentage {
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.daily-recommendations {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.daily-recommendations p {
+  margin: 0;
   color: #64748b;
 }
 

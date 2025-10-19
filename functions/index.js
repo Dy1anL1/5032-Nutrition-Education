@@ -207,18 +207,17 @@ exports.calculateNutritionStats = functions.https.onCall(async (data, context) =
       protein: 0,
       carbs: 0,
       fat: 0,
-      fiber: 0,
     };
 
     let totalRecipes = 0;
 
     recipes.forEach((recipe) => {
       if (recipe.nutrition) {
-        totalNutrition.calories += recipe.nutrition.calories || 0;
+        // Support both 'calories' and 'kcal' field names
+        totalNutrition.calories += recipe.nutrition.calories || recipe.nutrition.kcal || 0;
         totalNutrition.protein += recipe.nutrition.protein || 0;
         totalNutrition.carbs += recipe.nutrition.carbs || 0;
         totalNutrition.fat += recipe.nutrition.fat || 0;
-        totalNutrition.fiber += recipe.nutrition.fiber || 0;
         totalRecipes++;
       }
     });
@@ -229,7 +228,6 @@ exports.calculateNutritionStats = functions.https.onCall(async (data, context) =
       protein: totalRecipes > 0 ? Math.round(totalNutrition.protein / totalRecipes) : 0,
       carbs: totalRecipes > 0 ? Math.round(totalNutrition.carbs / totalRecipes) : 0,
       fat: totalRecipes > 0 ? Math.round(totalNutrition.fat / totalRecipes) : 0,
-      fiber: totalRecipes > 0 ? Math.round(totalNutrition.fiber / totalRecipes) : 0,
     };
 
     // Calculate daily recommended percentage (based on 2000 calorie diet)
@@ -238,7 +236,6 @@ exports.calculateNutritionStats = functions.https.onCall(async (data, context) =
       protein: 50, // grams
       carbs: 300, // grams
       fat: 70, // grams
-      fiber: 25, // grams
     };
 
     const percentages = {
@@ -246,7 +243,6 @@ exports.calculateNutritionStats = functions.https.onCall(async (data, context) =
       protein: Math.round((totalNutrition.protein / dailyRecommended.protein) * 100),
       carbs: Math.round((totalNutrition.carbs / dailyRecommended.carbs) * 100),
       fat: Math.round((totalNutrition.fat / dailyRecommended.fat) * 100),
-      fiber: Math.round((totalNutrition.fiber / dailyRecommended.fiber) * 100),
     };
 
     const result = {
