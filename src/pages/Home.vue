@@ -16,57 +16,74 @@
   </section>
 
   <section class="hero">
-    <div class="grid home-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
-      <article class="home-card">
-        <div class="hc-info">
-          <div>
-            <h3>Browse Recipes</h3>
-            <p>Explore a collection of healthy, diet-labelled recipes.</p>
-          </div>
-          <router-link class="hc-cta" to="/recipes">Browse</router-link>
+    <!-- Bootstrap responsive grid: col-12 on mobile, col-md-6 on tablet, col-lg-4 on desktop -->
+    <div class="container-fluid">
+      <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="home-card">
+            <div class="hc-info">
+              <div>
+                <h3>Browse Recipes</h3>
+                <p>Explore a collection of healthy, diet-labelled recipes.</p>
+              </div>
+              <router-link class="hc-cta" to="/recipes">Browse</router-link>
+            </div>
+          </article>
         </div>
-      </article>
 
-      <article class="home-card">
-        <div class="hc-info">
-          <div>
-            <h3>Meal Planner</h3>
-            <p>Plan weekly meals and generate shopping lists.</p>
-          </div>
-          <router-link class="hc-cta" to="/meal-planner">Open</router-link>
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="home-card">
+            <div class="hc-info">
+              <div>
+                <h3>Meal Planner</h3>
+                <p>Plan weekly meals and generate shopping lists.</p>
+              </div>
+              <router-link class="hc-cta" to="/meal-planner">Open</router-link>
+            </div>
+          </article>
         </div>
-      </article>
 
-      <article class="home-card">
-        <div class="hc-info">
-          <div>
-            <h3>Nutrition Education</h3>
-            <p>Read quick guides and learn why certain foods help health.</p>
-          </div>
-          <router-link class="hc-cta" to="/education">Learn</router-link>
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="home-card">
+            <div class="hc-info">
+              <div>
+                <h3>Nutrition Education</h3>
+                <p>Read quick guides and learn why certain foods help health.</p>
+              </div>
+              <router-link class="hc-cta" to="/education">Learn</router-link>
+            </div>
+          </article>
         </div>
-      </article>
+      </div>
     </div>
   </section>
 
   <section class="info-section">
-    <div class="info-content">
-      <h2>Why Choose Healthy Living?</h2>
-      <div class="benefits-grid">
-        <div class="benefit-item">
-          <div class="benefit-icon">🍎</div>
-          <h3>Nutritious Choices</h3>
-          <p>Every recipe is carefully curated with balanced nutrition in mind</p>
+    <!-- Bootstrap responsive container -->
+    <div class="container">
+      <h2 class="text-center mb-5">Why Choose Healthy Living?</h2>
+      <!-- Bootstrap responsive grid: col-12 on mobile, col-md-4 on tablet+ -->
+      <div class="row g-4">
+        <div class="col-12 col-md-4">
+          <div class="benefit-item">
+            <div class="benefit-icon">&#127822;</div>
+            <h3>Nutritious Choices</h3>
+            <p>Every recipe is carefully curated with balanced nutrition in mind</p>
+          </div>
         </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">📚</div>
-          <h3>Educational Content</h3>
-          <p>Learn about nutrition science and make informed food choices</p>
+        <div class="col-12 col-md-4">
+          <div class="benefit-item">
+            <div class="benefit-icon">&#128218;</div>
+            <h3>Educational Content</h3>
+            <p>Learn about nutrition science and make informed food choices</p>
+          </div>
         </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">⏰</div>
-          <h3>Time-Saving Tools</h3>
-          <p>Efficient meal planning to save time and reduce food waste</p>
+        <div class="col-12 col-md-4">
+          <div class="benefit-item">
+            <div class="benefit-icon">&#9200;</div>
+            <h3>Time-Saving Tools</h3>
+            <p>Efficient meal planning to save time and reduce food waste</p>
+          </div>
         </div>
       </div>
     </div>
@@ -79,9 +96,6 @@
 </script>
 
 <style scoped>
-.home-grid {
-  gap: 24px;
-}
 .home-card {
   border-radius: 12px;
   overflow: hidden;
@@ -136,28 +150,13 @@
 
 .info-section {
   margin-top: 60px;
-  padding: 40px 0;
+  padding: 60px 0;
   background: #f8fafc;
 }
 
-.info-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  text-align: center;
-}
-
-.info-content h2 {
+.info-section h2 {
   font-size: 32px;
-  margin-bottom: 40px;
   color: #1e293b;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
-  margin-top: 40px;
 }
 
 .benefit-item {

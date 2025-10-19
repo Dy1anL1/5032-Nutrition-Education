@@ -1,125 +1,170 @@
 <!--
-  NavBar
-  - Top-level site navigation. Uses <router-link> for client-side routing.
-  - Responsive behaviour: center links are hidden on small viewports; actions remain visible.
-  - To add a mobile menu, implement a toggle and show/hide the `.nav-links` block.
+  NavBar - Bootstrap Responsive Navigation
+  - Uses Bootstrap 5 navbar component with collapsible menu for mobile
+  - Fully responsive with hamburger menu on small screens
+  - Maintains original styling with Bootstrap structure
 -->
 <template>
   <header class="topbar" role="banner">
-    <div class="navbar">
-      <router-link class="brand" to="/" aria-label="Healthy Living - Home">
-        Healthy Living
-      </router-link>
+    <!-- Bootstrap Navbar: navbar-expand-lg means collapse on screens < 992px -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+      <div class="container-fluid px-4">
+        <!-- Brand -->
+        <router-link class="navbar-brand brand" to="/" aria-label="Healthy Living - Home">
+          Healthy Living
+        </router-link>
 
-      <nav class="nav-links" aria-label="Main navigation">
-        <RouterLink to="/" aria-label="Go to Home page">Home</RouterLink>
-        <RouterLink to="/recipes" aria-label="Browse Recipes">Recipes</RouterLink>
-        <RouterLink to="/meal-planner" aria-label="Plan your Meals">Meal Planner</RouterLink>
-        <RouterLink to="/healthy-places" aria-label="Find Healthy Places">Healthy Places</RouterLink>
-        <RouterLink to="/education" aria-label="Learn about Nutrition">Education</RouterLink>
-        <RouterLink to="/about" aria-label="About Us">About</RouterLink>
-        <RouterLink to="/contact" aria-label="Contact Us">Contact</RouterLink>
-        <RouterLink
-          v-if="authStore.isAdmin"
-          to="/admin"
-          class="admin-link"
-          aria-label="Access Admin Panel"
+        <!-- Hamburger Toggle Button for Mobile -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          @click="toggleMenu"
         >
-          <span class="admin-icon" aria-hidden="true">⚙️</span>
-          Admin Panel
-        </RouterLink>
-      </nav>
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <div class="actions" aria-label="User actions">
-        <template v-if="!authStore.isAuthenticated">
-          <router-link to="/login" class="login" aria-label="Login to your account">
-            Login
-          </router-link>
-          <router-link to="/register" class="btn-signup" aria-label="Create a new account">
-            Sign Up
-          </router-link>
-          <RouterLink to="/account" class="avatar" aria-label="Go to Account page">
-            <svg
-              viewBox="0 0 20 20"
-              width="22"
-              height="22"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <circle cx="12" cy="8" r="4"></circle>
-              <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
-            </svg>
-          </RouterLink>
-        </template>
-        <template v-else>
-          <span class="user-info" aria-label="Current user">
-            {{ authStore.userProfile?.name || authStore.user?.displayName || 'User' }}
-            <span
-              v-if="authStore.isAdmin"
-              class="role-badge"
-              role="status"
-              aria-label="Administrator account"
-            >
-              Admin
-            </span>
-            <span
-              v-else-if="!authStore.loading"
-              class="role-badge"
-              style="background: #3b82f6"
-              role="status"
-              :aria-label="`${authStore.userProfile?.role === 'admin' ? 'Administrator' : 'User'} account`"
-            >
-              {{ authStore.userProfile?.role === 'admin' ? 'Admin' : 'User' }}
-            </span>
-            <span
-              v-else
-              class="role-badge loading"
-              style="background: #9ca3af"
-              role="status"
-              aria-label="Loading user information"
-            >
-              ...
-            </span>
-          </span>
-          <button
-            @click="handleLogout"
-            class="logout-btn"
-            aria-label="Logout from your account"
-          >
-            Logout
-          </button>
-          <RouterLink to="/account" class="avatar" aria-label="Go to Account page">
-            <svg
-              viewBox="0 0 20 20"
-              width="22"
-              height="22"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <circle cx="12" cy="8" r="4"></circle>
-              <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
-            </svg>
-          </RouterLink>
-        </template>
+        <!-- Collapsible Content -->
+        <div class="collapse navbar-collapse" id="navbarContent" :class="{ show: menuOpen }">
+          <!-- Center Navigation Links -->
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav-links" aria-label="Main navigation">
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/" aria-label="Go to Home page" @click="closeMenu">Home</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/recipes" aria-label="Browse Recipes" @click="closeMenu">Recipes</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/meal-planner" aria-label="Plan your Meals" @click="closeMenu">Meal Planner</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/healthy-places" aria-label="Find Healthy Places" @click="closeMenu">Healthy Places</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/education" aria-label="Learn about Nutrition" @click="closeMenu">Education</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/about" aria-label="About Us" @click="closeMenu">About</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/contact" aria-label="Contact Us" @click="closeMenu">Contact</RouterLink>
+            </li>
+            <li v-if="authStore.isAdmin" class="nav-item">
+              <RouterLink class="nav-link admin-link" to="/admin" aria-label="Access Admin Panel" @click="closeMenu">
+                <span class="admin-icon" aria-hidden="true">&#9881;</span>
+                Admin Panel
+              </RouterLink>
+            </li>
+          </ul>
+
+          <!-- Right-side Actions -->
+          <div class="d-flex align-items-center actions gap-3">
+            <template v-if="!authStore.isAuthenticated">
+              <router-link to="/login" class="login" aria-label="Login to your account" @click="closeMenu">
+                Login
+              </router-link>
+              <router-link to="/register" class="btn-signup" aria-label="Create a new account" @click="closeMenu">
+                Sign Up
+              </router-link>
+              <RouterLink to="/account" class="avatar" aria-label="Go to Account page" @click="closeMenu">
+                <svg
+                  viewBox="0 0 20 20"
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
+                </svg>
+              </RouterLink>
+            </template>
+            <template v-else>
+              <span class="user-info d-none d-lg-flex" aria-label="Current user">
+                {{ authStore.userProfile?.name || authStore.user?.displayName || 'User' }}
+                <span
+                  v-if="authStore.isAdmin"
+                  class="role-badge"
+                  role="status"
+                  aria-label="Administrator account"
+                >
+                  Admin
+                </span>
+                <span
+                  v-else-if="!authStore.loading"
+                  class="role-badge"
+                  style="background: #3b82f6"
+                  role="status"
+                  :aria-label="`${authStore.userProfile?.role === 'admin' ? 'Administrator' : 'User'} account`"
+                >
+                  {{ authStore.userProfile?.role === 'admin' ? 'Admin' : 'User' }}
+                </span>
+                <span
+                  v-else
+                  class="role-badge loading"
+                  style="background: #9ca3af"
+                  role="status"
+                  aria-label="Loading user information"
+                >
+                  ...
+                </span>
+              </span>
+              <button
+                @click="handleLogout"
+                class="logout-btn"
+                aria-label="Logout from your account"
+              >
+                Logout
+              </button>
+              <RouterLink to="/account" class="avatar" aria-label="Go to Account page" @click="closeMenu">
+                <svg
+                  viewBox="0 0 20 20"
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
+                </svg>
+              </RouterLink>
+            </template>
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
   </header>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const menuOpen = ref(false)
+
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value
+}
+
+const closeMenu = () => {
+  menuOpen.value = false
+}
 
 const handleLogout = async () => {
+  closeMenu()
   const result = await authStore.logout()
   if (result.success) {
     router.push('/')
@@ -132,7 +177,7 @@ const handleLogout = async () => {
   --green: #22c55e;
   --green-d: #16a34a;
   --ink: #1b1b1b;
-  --muted: #4b5563; /* Darker for WCAG AA contrast */
+  --muted: #4b5563;
   --line: #e6e6e6;
 }
 
@@ -141,52 +186,45 @@ const handleLogout = async () => {
   border-bottom: 1px solid var(--line);
 }
 
+/* Override Bootstrap navbar styles to match original design */
 .navbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  height: 80px;
-  padding: 0 32px;
-  width: 100%;
-  box-sizing: border-box;
+  min-height: 80px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .brand {
-  display: flex;
-  align-items: center;
   font-weight: 800;
   font-size: 30px;
-  color: var(--ink);
+  color: var(--ink) !important;
   letter-spacing: 0.2px;
-  text-decoration: none;
-  gap: 10px;
-}
-.logo-icon {
-  display: flex;
-  align-items: center;
-  margin-right: 2px;
+  text-decoration: none !important;
 }
 
-.nav-links {
-  justify-self: center;
-  display: flex;
-  gap: 60px;
-  align-items: center;
+.brand:hover {
+  color: var(--ink) !important;
 }
-.nav-links :deep(a) {
+
+/* Navigation links styling */
+.nav-links {
+  gap: 2rem;
+}
+
+.nav-links .nav-link {
   font-weight: 600;
-  font-size: 21px;
-  color: #374151; /* Darker color for WCAG AA contrast (4.5:1+) */
-  padding: 3px 2px;
-  position: relative;
+  font-size: 18px;
+  color: #374151 !important;
+  padding: 0.5rem 0.25rem;
   text-decoration: none;
   transition: color 0.18s ease;
 }
 
+.nav-links .nav-link:hover,
+.nav-links .nav-link.router-link-active {
+  color: var(--green) !important;
+}
+
 .actions {
-  justify-self: end;
-  display: flex;
-  align-items: center;
   gap: 18px;
 }
 
@@ -288,20 +326,54 @@ const handleLogout = async () => {
   font-size: 16px;
 }
 
-@media (max-width: 960px) {
-  .nav-links {
-    gap: 20px;
+/* Mobile responsiveness - Bootstrap handles collapse, we just need to adjust styles */
+@media (max-width: 991px) {
+  .navbar {
+    min-height: 60px;
   }
-  .nav-links a {
-    font-size: 16px;
+
+  .brand {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
+  .nav-links .nav-item {
+    width: 100%;
+  }
+
+  .nav-links .nav-link {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .actions {
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .btn-signup {
+    font-size: 18px;
+    padding: 8px 16px;
   }
 }
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
+
+@media (max-width: 576px) {
+  .brand {
+    font-size: 20px;
   }
-  .actions {
-    gap: 14px;
+
+  .user-info {
+    font-size: 14px;
+  }
+
+  .logout-btn {
+    font-size: 16px;
   }
 }
 </style>

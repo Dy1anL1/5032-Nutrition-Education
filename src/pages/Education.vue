@@ -8,77 +8,92 @@
 
   <div class="education-content">
 
-    <!-- Topics Grid -->
+    <!-- Topics Grid with Bootstrap Responsive Layout -->
     <section class="topics-section">
       <div class="section-header">
         <h2>Explore by Topic</h2>
         <p>Choose what interests you most</p>
       </div>
-      
-      <div class="topics-grid">
-        <div class="topic-card">
-          <div class="topic-icon">🥗</div>
-          <h3>Balanced Nutrition</h3>
-          <p>Understanding macronutrients, micronutrients, and how to create balanced meals that fuel your body.</p>
-          <div class="topic-stats">
-            <span>12 articles</span>
-            <span>•</span>
-            <span>Beginner</span>
-          </div>
-        </div>
 
-        <div class="topic-card">
-          <div class="topic-icon">🍎</div>
-          <h3>Weight Management</h3>
-          <p>Sustainable approaches to achieving and maintaining a healthy weight through nutrition and lifestyle.</p>
-          <div class="topic-stats">
-            <span>8 articles</span>
-            <span>•</span>
-            <span>Intermediate</span>
+      <!-- Bootstrap responsive grid: col-12 (mobile), col-md-6 (tablet), col-lg-4 (desktop) -->
+      <div class="container-fluid">
+        <div class="row g-4">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#127813;</div>
+              <h3>Balanced Nutrition</h3>
+              <p>Understanding macronutrients, micronutrients, and how to create balanced meals that fuel your body.</p>
+              <div class="topic-stats">
+                <span>12 articles</span>
+                <span>&bull;</span>
+                <span>Beginner</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="topic-card">
-          <div class="topic-icon">💪</div>
-          <h3>Sports Nutrition</h3>
-          <p>Optimize your performance with targeted nutrition strategies for athletes and active individuals.</p>
-          <div class="topic-stats">
-            <span>6 articles</span>
-            <span>•</span>
-            <span>Advanced</span>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#127822;</div>
+              <h3>Weight Management</h3>
+              <p>Sustainable approaches to achieving and maintaining a healthy weight through nutrition and lifestyle.</p>
+              <div class="topic-stats">
+                <span>8 articles</span>
+                <span>&bull;</span>
+                <span>Intermediate</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="topic-card">
-          <div class="topic-icon">🌱</div>
-          <h3>Plant-Based Eating</h3>
-          <p>Complete guide to plant-based nutrition, including protein sources and essential nutrients.</p>
-          <div class="topic-stats">
-            <span>10 articles</span>
-            <span>•</span>
-            <span>All levels</span>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#128170;</div>
+              <h3>Sports Nutrition</h3>
+              <p>Optimize your performance with targeted nutrition strategies for athletes and active individuals.</p>
+              <div class="topic-stats">
+                <span>6 articles</span>
+                <span>&bull;</span>
+                <span>Advanced</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="topic-card">
-          <div class="topic-icon">🛒</div>
-          <h3>Smart Shopping</h3>
-          <p>Learn to read labels, compare products, and make budget-friendly healthy choices at the store.</p>
-          <div class="topic-stats">
-            <span>7 articles</span>
-            <span>•</span>
-            <span>Beginner</span>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#127793;</div>
+              <h3>Plant-Based Eating</h3>
+              <p>Complete guide to plant-based nutrition, including protein sources and essential nutrients.</p>
+              <div class="topic-stats">
+                <span>10 articles</span>
+                <span>&bull;</span>
+                <span>All levels</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="topic-card">
-          <div class="topic-icon">👶</div>
-          <h3>Family Nutrition</h3>
-          <p>Practical advice for feeding families, including kid-friendly healthy recipes and meal planning.</p>
-          <div class="topic-stats">
-            <span>9 articles</span>
-            <span>•</span>
-            <span>All levels</span>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#128722;</div>
+              <h3>Smart Shopping</h3>
+              <p>Learn to read labels, compare products, and make budget-friendly healthy choices at the store.</p>
+              <div class="topic-stats">
+                <span>7 articles</span>
+                <span>&bull;</span>
+                <span>Beginner</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="topic-card">
+              <div class="topic-icon">&#128118;</div>
+              <h3>Family Nutrition</h3>
+              <p>Practical advice for feeding families, including kid-friendly healthy recipes and meal planning.</p>
+              <div class="topic-stats">
+                <span>9 articles</span>
+                <span>&bull;</span>
+                <span>All levels</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

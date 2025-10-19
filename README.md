@@ -17,7 +17,11 @@ This project is a **comprehensive Vue 3 single-page web application** developed 
 
 ### **Core Application (A & B Requirements)**
 - **A.1** - Vue 3 framework with Vite build tool and Vue Router for navigation
-- **A.2** - Fully responsive design with Bootstrap integration
+- **A.2** - Fully responsive design with Bootstrap 5 framework
+  - Bootstrap responsive grid system (container, row, col-*)
+  - Mobile-first approach with breakpoints (sm, md, lg, xl)
+  - Responsive navbar with hamburger menu on mobile
+  - Responsive layouts across all pages
 - **B.1** - Comprehensive form validation across all forms (Login, Register, Contact)
 - **B.2** - Dynamic recipe data management with advanced filtering and search
 
@@ -39,15 +43,20 @@ This project is a **comprehensive Vue 3 single-page web application** developed 
 - **D.3** - Interactive data tables with sort, search, and pagination
 
 ### **Advanced Features (E & F Requirements)**
-- **E.1** - Firebase Cloud Functions for email automation
+- **E.1** - Firebase Cloud Functions for email automation and calculations
 - **E.2** - Geo Location with interactive map for finding healthy places
 - **E.3** - WCAG 2.1 Level AA Accessibility compliance
+- **E.4** - Export functionality (PDF, Excel, Image) for meal plans and data
+- **F.1** - Innovation Features (4 advanced features):
+  - Interactive Charts in Admin Dashboard (Chart.js visualization)
+  - Bulk Email System for admin communications
+  - Public REST API with 2 endpoints for recipes
+  - Offline Features with caching and status indicators
 - **Meal Planner** - Interactive weekly meal planning calendar
 - **Recipe Rating System** - Star-based ratings with statistical analysis
 - **Shopping List Generator** - Automatic ingredient compilation from meal plans
 - **Educational Content** - Comprehensive nutrition education resources
 - **Firestore Integration** - Cloud database for user data and ratings
-- **Offline Support** - Graceful handling of network connectivity issues
 
 ## 📱 Application Pages & Components
 
@@ -367,3 +376,241 @@ Tested with **accessibilitychecker.org** (WCAG 2.1 Level AA):
 ### Documentation
 
 Complete accessibility implementation details are available in [ACCESSIBILITY.md](ACCESSIBILITY.md)
+
+---
+
+## Export Functionality (E.4)
+
+This application provides comprehensive export capabilities for meal plans and data visualization.
+
+### Export Features
+
+#### 1. PDF Export
+- **Meal Plan Export**: Export weekly meal plans as formatted PDF documents
+- **User Data Export**: Admin can export user lists and statistics
+- **Customizable Layout**: Professional formatting with headers and tables
+
+#### 2. Excel Export
+- **Shopping Lists**: Export shopping lists as Excel spreadsheets
+- **User Reports**: Admin dashboard user data export to Excel
+- **Multiple Sheets**: Organized data across multiple worksheets
+
+#### 3. Image Export
+- **Visual Data**: Capture charts and visualizations as images
+- **Meal Plan Screenshots**: Export meal plan calendar as PNG/JPG
+- **High Quality**: Uses html2canvas for pixel-perfect captures
+
+### Implementation
+
+Libraries used:
+- **jsPDF**: PDF generation with auto-table plugin
+- **xlsx**: Excel file creation and manipulation
+- **html2canvas**: DOM to image conversion
+
+Files implementing export functionality:
+- [src/pages/MealPlanner.vue](src/pages/MealPlanner.vue) - Meal plan PDF export
+- [src/pages/ShoppingLists.vue](src/pages/ShoppingLists.vue) - Shopping list Excel export
+- [src/pages/AdminDashboard.vue](src/pages/AdminDashboard.vue) - Chart and data exports
+
+### Usage
+
+1. **Export Meal Plan**: Click "Export as PDF" button in Meal Planner page
+2. **Export Shopping List**: Click "Export to Excel" in Shopping Lists page
+3. **Export Charts**: Use "Export Chart" buttons in Admin Dashboard
+
+---
+
+## Innovation Features (F.1)
+
+Four advanced features implemented to enhance the application's capabilities:
+
+### 1. Interactive Charts (Chart.js Integration)
+
+**Location**: Admin Dashboard
+
+**Features**:
+- Doughnut Chart for user role distribution
+- Bar Chart for user registration trends
+- Pie Chart for recipe category distribution
+- Line Chart for rating trends over time
+
+**Implementation**:
+- Uses Chart.js and vue-chartjs libraries
+- Real-time data updates from Firestore
+- Responsive and interactive visualizations
+- Export chart images functionality
+
+**Files**:
+- [src/pages/AdminDashboard.vue](src/pages/AdminDashboard.vue) - Chart components and data
+
+### 2. Bulk Email System
+
+**Location**: Admin Dashboard
+
+**Features**:
+- Select multiple users with checkboxes
+- Compose custom email messages
+- Progress tracking during sending
+- Error handling and retry logic
+- Send to all users or selected subset
+
+**Implementation**:
+- Integrated with SendGrid API
+- Batch processing with individual tracking
+- Modal interface for email composition
+- Success/failure reporting
+
+**Files**:
+- [src/components/BulkEmailModal.vue](src/components/BulkEmailModal.vue) - Email composition UI
+- [src/services/emailService.js](src/services/emailService.js) - Bulk email logic
+- [src/pages/AdminDashboard.vue](src/pages/AdminDashboard.vue) - User selection
+
+**Usage**: Select users in admin dashboard, click "Send Bulk Email" button
+
+### 3. Public REST API
+
+**Endpoints**:
+
+1. **GET /getRecipes** - Retrieve all recipes with filtering
+   - Query parameters: category, maxCalories, minProtein, limit
+   - Returns: Array of recipe objects
+
+2. **GET /getRecipeById/{id}** - Get specific recipe by ID
+   - Path parameter: recipe ID
+   - Returns: Recipe object with ratings
+
+**Features**:
+- CORS enabled for public access
+- Query filtering and pagination
+- Includes rating data from Firestore
+- Rate limiting and error handling
+
+**Implementation**:
+- Firebase Cloud Functions (HTTPS triggers)
+- Firestore database integration
+- RESTful API design principles
+
+**Documentation**:
+- API documentation available on About page
+- Live endpoints with copy-to-clipboard functionality
+- Example requests and responses
+
+**Base URL**: https://us-central1-nutritioneducation-jiaze.cloudfunctions.net
+
+**Files**:
+- [functions/index.js](functions/index.js) - Cloud Functions endpoints
+- [src/pages/About.vue](src/pages/About.vue) - API documentation UI
+- [scripts/importRecipesSimple.js](scripts/importRecipesSimple.js) - Data import script
+
+### 4. Offline Features
+
+**Components**:
+
+1. **Offline Indicator**
+   - Visual banner when network is unavailable
+   - "Retry" button to check connectivity
+   - Toast notification when back online
+   - Persistent across all pages
+
+2. **Cache Management**
+   - LocalStorage-based caching with expiry (7 days)
+   - Automatic cache of recipes and user data
+   - Cache status display with age information
+   - Manual cache clearing functionality
+
+3. **Cache Status Banner**
+   - Shows number of cached recipes
+   - Displays last update time (minutes/hours/days ago)
+   - "Clear Cache" button for manual management
+   - Only visible in offline mode
+
+**Implementation**:
+- Network status detection (navigator.onLine)
+- Service Worker pattern for offline support
+- LocalStorage with timestamp and expiry
+- Graceful degradation when offline
+
+**Files**:
+- [src/services/offlineService.js](src/services/offlineService.js) - Caching logic
+- [src/components/OfflineIndicator.vue](src/components/OfflineIndicator.vue) - Status banner
+- [src/pages/Recipes.vue](src/pages/Recipes.vue) - Cache status and management
+- [src/App.vue](src/App.vue) - Global offline indicator
+
+**Testing**:
+1. Enable offline mode in browser DevTools (Network tab)
+2. Observe offline indicator at top of page
+3. Navigate to Recipes page to see cache banner
+4. Refresh page to verify cached data loads
+5. Re-enable network to see "Back online" notification
+
+---
+
+## Bootstrap 5 Responsive Design (A.2)
+
+This application is fully responsive and compatible with various devices using Bootstrap 5 framework.
+
+### Responsive Features Implemented
+
+#### 1. Bootstrap Grid System
+
+**Home Page** ([src/pages/Home.vue](src/pages/Home.vue))
+- Container-fluid for full-width layouts
+- Responsive columns: `col-12 col-md-6 col-lg-4`
+- Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns
+- Benefits section adapts from 1 to 3 columns
+
+**Recipes Page** ([src/pages/Recipes.vue](src/pages/Recipes.vue))
+- Advanced responsive grid: `col-12 col-sm-6 col-lg-4 col-xl-3`
+- Mobile: 1 column, Tablet: 2 columns, Desktop: 3 columns, Large screens: 4 columns
+- Recipe cards automatically reflow based on screen size
+
+**Login Page** ([src/pages/Login.vue](src/pages/Login.vue))
+- Centered responsive form: `col-12 col-md-8 col-lg-6 col-xl-5`
+- Form width adapts to screen size for optimal readability
+
+#### 2. Responsive Navigation Bar
+
+**NavBar Component** ([src/components/NavBar.vue](src/components/NavBar.vue))
+- Bootstrap navbar with collapse functionality
+- Hamburger menu icon on screens < 992px (navbar-expand-lg)
+- Mobile menu slides down with all navigation links
+- User actions remain accessible on all screen sizes
+- JavaScript-powered toggle for mobile menu
+
+#### 3. Bootstrap Breakpoints Used
+
+- **Extra Small (xs)**: < 576px - Mobile phones
+- **Small (sm)**: >= 576px - Large phones
+- **Medium (md)**: >= 768px - Tablets
+- **Large (lg)**: >= 992px - Desktops
+- **Extra Large (xl)**: >= 1200px - Large desktops
+
+#### 4. Bootstrap Utility Classes
+
+- `d-flex`, `d-none`, `d-lg-flex` - Display utilities for showing/hiding elements
+- `gap-3`, `gap-4` - Spacing between flex/grid items
+- `mb-2`, `mb-lg-0` - Responsive margins
+- `px-4` - Responsive padding
+- `align-items-center`, `justify-content-center` - Flexbox alignment
+- `container`, `container-fluid` - Responsive containers
+
+#### 5. Mobile-First Approach
+
+All layouts are designed mobile-first, starting with single-column layouts and expanding to multi-column on larger screens. This ensures optimal performance and user experience on all devices.
+
+### Testing Responsiveness
+
+1. **Browser DevTools**: Press F12 and toggle device toolbar
+2. **Responsive Design Mode**: Test at different breakpoints (320px, 768px, 1024px, 1440px)
+3. **Real Devices**: Test on actual phones, tablets, and desktops
+4. **Bootstrap Classes**: All responsive behavior is handled by Bootstrap's proven grid system
+
+### Files with Bootstrap Responsive Implementation
+
+- [src/pages/Home.vue](src/pages/Home.vue) - Responsive grid for cards and benefits
+- [src/pages/Recipes.vue](src/pages/Recipes.vue) - Responsive recipe grid (1-4 columns)
+- [src/pages/Login.vue](src/pages/Login.vue) - Centered responsive form
+- [src/components/NavBar.vue](src/components/NavBar.vue) - Responsive navbar with hamburger menu
+- [src/main.js](src/main.js) - Bootstrap CSS and JS imports
+
+---

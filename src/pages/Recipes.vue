@@ -97,21 +97,28 @@
     </div>
   </section>
 
-  <!-- Recipe Card grid -->
+  <!-- Recipe Card grid with Bootstrap responsive layout -->
   <section class="grid-wrap" aria-label="Recipe results">
-    <div class="cards" role="list">
-      <RecipeCard
-        v-for="r in filtered"
-        :key="r.id"
-        :recipe="r"
-        role="listitem"
-        @edit-recipe="handleEditRecipe"
-        @delete-recipe="handleDeleteRecipe"
-      />
+    <!-- Bootstrap responsive grid: col-12 (mobile), col-sm-6 (tablet), col-lg-4 (desktop), col-xl-3 (large) -->
+    <div class="container-fluid">
+      <div class="row g-4" role="list">
+        <div
+          v-for="r in filtered"
+          :key="r.id"
+          class="col-12 col-sm-6 col-lg-4 col-xl-3"
+          role="listitem"
+        >
+          <RecipeCard
+            :recipe="r"
+            @edit-recipe="handleEditRecipe"
+            @delete-recipe="handleDeleteRecipe"
+          />
+        </div>
+      </div>
+      <p v-if="filtered.length === 0" class="no-results" role="status">
+        No recipes found. Try adjusting your filters.
+      </p>
     </div>
-    <p v-if="filtered.length === 0" class="no-results" role="status">
-      No recipes found. Try adjusting your filters.
-    </p>
   </section>
 </template>
 

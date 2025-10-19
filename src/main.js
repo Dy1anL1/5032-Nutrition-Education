@@ -11,8 +11,9 @@ import { useAuthStore } from './stores/auth.js'
 import './assets/base.css'
 import './assets/main.css'
 import './assets/accessibility.css' // WCAG 2.1 AA accessibility styles
-// Bootstrap utility classes (optional; added for convenience in some pages)
+// Bootstrap CSS and JavaScript for responsive components
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js' // Includes Popper.js for dropdowns, popovers, tooltips
 
 // Create the app
 const app = createApp(App)

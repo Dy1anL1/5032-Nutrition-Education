@@ -5,18 +5,21 @@
   - Fields: email, password; shows success/failure UI flags.
 -->
 <template>
-  <div class="simple-title">
-    <h1 id="login-heading">Login</h1>
-    <p id="login-description">Access your saved plans and recipes</p>
-  </div>
-  <form
-    @submit.prevent="onSubmit"
-    class="grid"
-    style="max-width: 420px"
-    aria-labelledby="login-heading"
-    aria-describedby="login-description"
-    novalidate
-  >
+  <!-- Bootstrap responsive container -->
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="simple-title">
+          <h1 id="login-heading">Login</h1>
+          <p id="login-description">Access your saved plans and recipes</p>
+        </div>
+        <form
+          @submit.prevent="onSubmit"
+          class="grid"
+          aria-labelledby="login-heading"
+          aria-describedby="login-description"
+          novalidate
+        >
     <label for="email-input">
       Email
       <span class="required-indicator" aria-label="required">*</span>
@@ -135,10 +138,13 @@
         Register
       </router-link>
     </p>
-  </form>
-  <p class="muted" style="margin-top: 12px; font-size: 14px">
-    Create an account to test the authentication system.
-  </p>
+        </form>
+        <p class="muted" style="margin-top: 12px; font-size: 14px">
+          Create an account to test the authentication system.
+        </p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
