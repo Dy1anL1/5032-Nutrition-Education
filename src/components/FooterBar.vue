@@ -4,7 +4,7 @@
   - Update addresses, contact emails and support links here. No runtime script is required.
 -->
 <template>
-  <footer class="footer">
+  <footer class="footer" role="contentinfo">
     <div class="container grid footer-top">
       <!-- Brand / About / Contact -->
       <div class="brand">
@@ -16,65 +16,65 @@
           healthier eating habits and improve public health outcomes.
         </p>
 
-        <ul class="contact">
-          <li>
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"
-              />
-            </svg>
-            Melbourne, Victoria, Australia
-          </li>
-          <li>
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 13.2L2 6V18h20V6l-10 7.2zM12 11L2 4h20L12 11z" />
-            </svg>
-            <a href="mailto:info@HealthyLiving.org.au">info@HealthyLiving.org.au</a>
-          </li>
-          <li>Healthy Living. All rights reserved. A not-for-profit organization.</li>
-          <li>
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.24c1.2.48 2.5.74 3.8.74a1 1 0 011 1V20a1 1 0 01-1 1C11.6 21 3 12.4 3 2a1 1 0 011-1h3.3a1 1 0 011 1c0 1.3.26 2.6.74 3.8a1 1 0 01-.24 1.1l-2.2 2.2z"
-              />
-            </svg>
-            +61 3 9XXX XXXX
-          </li>
-        </ul>
+        <address class="contact">
+          <ul class="contact-list">
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"
+                />
+              </svg>
+              <span>Melbourne, Victoria, Australia</span>
+            </li>
+            <li>
+              <span>Healthy Living. All rights reserved. A not-for-profit organization.</span>
+            </li>
+            <li>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.24c1.2.48 2.5.74 3.8.74a1 1 0 011 1V20a1 1 0 01-1 1C11.6 21 3 12.4 3 2a1 1 0 011-1h3.3a1 1 0 011 1c0 1.3.26 2.6.74 3.8a1 1 0 01-.24 1.1l-2.2 2.2z"
+                />
+              </svg>
+              <a href="tel:+61390000000" aria-label="Call us at +61 3 9XXX XXXX">
+                +61 3 9XXX XXXX
+              </a>
+            </li>
+          </ul>
+        </address>
       </div>
 
       <!-- Quick Links -->
-      <nav class="col">
-        <h4>Quick Links</h4>
+      <nav class="col" aria-labelledby="quick-links-heading">
+        <h4 id="quick-links-heading">Quick Links</h4>
         <ul class="links">
-          <li><RouterLink to="/recipes">Recipes</RouterLink></li>
-          <li><RouterLink to="/meal-planner">Meal Planner</RouterLink></li>
-          <li><RouterLink to="/education">Education</RouterLink></li>
-          <li><RouterLink to="/about">About Us</RouterLink></li>
+          <li><RouterLink to="/recipes" aria-label="Browse our recipes">Recipes</RouterLink></li>
+          <li><RouterLink to="/meal-planner" aria-label="Plan your meals">Meal Planner</RouterLink></li>
+          <li><RouterLink to="/education" aria-label="Learn about nutrition">Education</RouterLink></li>
+          <li><RouterLink to="/about" aria-label="Learn about us">About Us</RouterLink></li>
         </ul>
       </nav>
 
       <!-- Support -->
-      <nav class="col">
-        <h4>Support</h4>
+      <nav class="col" aria-labelledby="support-heading">
+        <h4 id="support-heading">Support</h4>
         <ul class="links">
-          <li><RouterLink to="/contact">Contact Us</RouterLink></li>
-          <li><a href="#" aria-label="Privacy Policy">Privacy Policy</a></li>
-          <li><a href="#" aria-label="Terms of Service">Terms of Service</a></li>
-          <li><a href="#" aria-label="Accessibility statement">Accessibility</a></li>
+          <li><RouterLink to="/contact" aria-label="Contact us">Contact Us</RouterLink></li>
+          <li><a href="#" aria-label="Read our Privacy Policy">Privacy Policy</a></li>
+          <li><a href="#" aria-label="Read our Terms of Service">Terms of Service</a></li>
+          <li><a href="#" aria-label="View Accessibility Statement">Accessibility</a></li>
         </ul>
       </nav>
     </div>
 
-    <hr class="divider" />
+    <hr class="divider" role="separator" aria-hidden="true" />
 
     <div class="container footer-bottom">
       <p>
-        © Healthy Living. All rights reserved.
+        <span>&copy; {{ new Date().getFullYear() }} Healthy Living. All rights reserved.</span>
         <span class="muted">A not-for-profit organization.</span>
       </p>
       <p class="made">
-        Made with <span class="heart" aria-hidden="true">&#9829;</span> for better health
+        Made with <span class="heart" aria-label="love" role="img">&#9829;</span> for better health
       </p>
     </div>
   </footer>
@@ -119,24 +119,33 @@
 }
 
 .contact {
+  font-style: normal;
+}
+.contact-list {
   list-style: none;
   display: grid;
   gap: 8px;
+  padding: 0;
+  margin: 0;
 }
-.contact .ico {
+.contact-list .ico {
   width: 18px;
   height: 18px;
   fill: #567482;
   margin-right: 8px;
   flex: 0 0 18px;
 }
-.contact li {
+.contact-list li {
   display: flex;
   align-items: center;
   color: #3c5663;
 }
-.contact a {
+.contact-list a {
   text-decoration: underline;
+  color: #2c4451;
+}
+.contact-list a:hover {
+  color: #22c55e;
 }
 
 .col h4 {

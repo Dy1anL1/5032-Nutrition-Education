@@ -6,7 +6,7 @@
   - Clicking the CTA navigates to the recipe detail page.
 -->
 <template>
-  <article class="rc-card">
+  <article class="rc-card" :aria-labelledby="`recipe-title-${recipe.id}`">
     <div
       class="rc-hero"
       :style="{
@@ -14,22 +14,44 @@
           'url(' + (recipe.image || 'https://via.placeholder.com/800x480?text=Recipe') + ')',
       }"
       role="img"
-      :aria-label="recipe.title || 'Recipe image'"
+      :aria-label="`${recipe.title} - Recipe photo`"
     >
-      <div class="cal-badge">{{ (recipe.nutrition && recipe.nutrition.kcal) || '-' }} cal</div>
-      <div v-if="authStore.isAdmin" class="admin-controls">
-        <button @click="editRecipe" class="admin-btn edit" title="Edit Recipe">✏️</button>
-        <button @click="deleteRecipe" class="admin-btn delete" title="Delete Recipe">🗑️</button>
+      <div class="cal-badge" role="text" :aria-label="`${recipe.nutrition?.kcal || 0} calories`">
+        {{ (recipe.nutrition && recipe.nutrition.kcal) || '-' }} cal
+      </div>
+      <div v-if="authStore.isAdmin" class="admin-controls" role="group" aria-label="Recipe admin actions">
+        <button
+          @click="editRecipe"
+          class="admin-btn edit"
+          :aria-label="`Edit ${recipe.title} recipe`"
+          title="Edit Recipe"
+        >
+          <span aria-hidden="true">✏️</span>
+        </button>
+        <button
+          @click="deleteRecipe"
+          class="admin-btn delete"
+          :aria-label="`Delete ${recipe.title} recipe`"
+          title="Delete Recipe"
+        >
+          <span aria-hidden="true">🗑️</span>
+        </button>
       </div>
     </div>
 
     <div class="rc-info">
       <div>
-        <h3 class="rc-title">{{ recipe.title }}</h3>
+        <h2 class="rc-title" :id="`recipe-title-${recipe.id}`">{{ recipe.title }}</h2>
         <p class="rc-summary">{{ recipe.summary }}</p>
       </div>
 
-      <router-link class="rc-cta" :to="'/recipes/' + recipe.id">View Recipe</router-link>
+      <router-link
+        class="rc-cta"
+        :to="'/recipes/' + recipe.id"
+        :aria-label="`View ${recipe.title} recipe details`"
+      >
+        View Recipe
+      </router-link>
     </div>
   </article>
 </template>

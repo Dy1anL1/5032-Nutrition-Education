@@ -5,29 +5,40 @@
   - To add a mobile menu, implement a toggle and show/hide the `.nav-links` block.
 -->
 <template>
-  <header class="topbar">
+  <header class="topbar" role="banner">
     <div class="navbar">
-      <router-link class="brand" to="/"> Healthy Living </router-link>
+      <router-link class="brand" to="/" aria-label="Healthy Living - Home">
+        Healthy Living
+      </router-link>
 
-      <nav class="nav-links">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/recipes">Recipes</RouterLink>
-        <RouterLink to="/meal-planner">Meal Planner</RouterLink>
-        <RouterLink to="/healthy-places">Healthy Places</RouterLink>
-        <RouterLink to="/education">Education</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/contact">Contact</RouterLink>
-        <RouterLink v-if="authStore.isAdmin" to="/admin" class="admin-link">
-          <span class="admin-icon">⚙️</span>
+      <nav class="nav-links" aria-label="Main navigation">
+        <RouterLink to="/" aria-label="Go to Home page">Home</RouterLink>
+        <RouterLink to="/recipes" aria-label="Browse Recipes">Recipes</RouterLink>
+        <RouterLink to="/meal-planner" aria-label="Plan your Meals">Meal Planner</RouterLink>
+        <RouterLink to="/healthy-places" aria-label="Find Healthy Places">Healthy Places</RouterLink>
+        <RouterLink to="/education" aria-label="Learn about Nutrition">Education</RouterLink>
+        <RouterLink to="/about" aria-label="About Us">About</RouterLink>
+        <RouterLink to="/contact" aria-label="Contact Us">Contact</RouterLink>
+        <RouterLink
+          v-if="authStore.isAdmin"
+          to="/admin"
+          class="admin-link"
+          aria-label="Access Admin Panel"
+        >
+          <span class="admin-icon" aria-hidden="true">⚙️</span>
           Admin Panel
         </RouterLink>
       </nav>
 
-      <div class="actions">
+      <div class="actions" aria-label="User actions">
         <template v-if="!authStore.isAuthenticated">
-          <router-link to="/login" class="login">Login</router-link>
-          <router-link to="/register" class="btn-signup">Sign Up</router-link>
-          <RouterLink to="/account" class="avatar" aria-label="Account">
+          <router-link to="/login" class="login" aria-label="Login to your account">
+            Login
+          </router-link>
+          <router-link to="/register" class="btn-signup" aria-label="Create a new account">
+            Sign Up
+          </router-link>
+          <RouterLink to="/account" class="avatar" aria-label="Go to Account page">
             <svg
               viewBox="0 0 20 20"
               width="22"
@@ -35,6 +46,8 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
+              aria-hidden="true"
+              focusable="false"
             >
               <circle cx="12" cy="8" r="4"></circle>
               <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
@@ -42,16 +55,43 @@
           </RouterLink>
         </template>
         <template v-else>
-          <span class="user-info">
+          <span class="user-info" aria-label="Current user">
             {{ authStore.userProfile?.name || authStore.user?.displayName || 'User' }}
-            <span v-if="authStore.isAdmin" class="role-badge">Admin</span>
-            <span v-else-if="!authStore.loading" class="role-badge" style="background: #3b82f6">
+            <span
+              v-if="authStore.isAdmin"
+              class="role-badge"
+              role="status"
+              aria-label="Administrator account"
+            >
+              Admin
+            </span>
+            <span
+              v-else-if="!authStore.loading"
+              class="role-badge"
+              style="background: #3b82f6"
+              role="status"
+              :aria-label="`${authStore.userProfile?.role === 'admin' ? 'Administrator' : 'User'} account`"
+            >
               {{ authStore.userProfile?.role === 'admin' ? 'Admin' : 'User' }}
             </span>
-            <span v-else class="role-badge loading" style="background: #9ca3af">...</span>
+            <span
+              v-else
+              class="role-badge loading"
+              style="background: #9ca3af"
+              role="status"
+              aria-label="Loading user information"
+            >
+              ...
+            </span>
           </span>
-          <button @click="handleLogout" class="logout-btn">Logout</button>
-          <RouterLink to="/account" class="avatar" aria-label="Account">
+          <button
+            @click="handleLogout"
+            class="logout-btn"
+            aria-label="Logout from your account"
+          >
+            Logout
+          </button>
+          <RouterLink to="/account" class="avatar" aria-label="Go to Account page">
             <svg
               viewBox="0 0 20 20"
               width="22"
@@ -59,6 +99,8 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
+              aria-hidden="true"
+              focusable="false"
             >
               <circle cx="12" cy="8" r="4"></circle>
               <path d="M4 20c1.5-3.5 5-6 8-6s6.5 2.5 8 6"></path>
@@ -90,7 +132,7 @@ const handleLogout = async () => {
   --green: #22c55e;
   --green-d: #16a34a;
   --ink: #1b1b1b;
-  --muted: #586174;
+  --muted: #4b5563; /* Darker for WCAG AA contrast */
   --line: #e6e6e6;
 }
 
@@ -134,7 +176,7 @@ const handleLogout = async () => {
 .nav-links :deep(a) {
   font-weight: 600;
   font-size: 21px;
-  color: var(--muted);
+  color: #374151; /* Darker color for WCAG AA contrast (4.5:1+) */
   padding: 3px 2px;
   position: relative;
   text-decoration: none;
@@ -171,7 +213,7 @@ const handleLogout = async () => {
   border-radius: 10px;
   font-weight: 700;
   font-size: 21px;
-  background: #22c55e !important;
+  background: #16a34a !important; /* Darker green for WCAG AA contrast */
   color: #fff !important;
   border: none !important;
   text-decoration: none;
@@ -180,7 +222,7 @@ const handleLogout = async () => {
 }
 .btn-signup:hover,
 .btn-signup:focus-visible {
-  background: var(--green-d);
+  background: #15803d !important; /* Even darker on hover */
 }
 
 .user-info {

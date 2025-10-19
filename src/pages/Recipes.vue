@@ -6,9 +6,9 @@
 -->
 <template>
   <!-- Full-width title bar -->
-  <section class="title-bar">
+  <section class="title-bar" aria-labelledby="page-title">
     <div class="title-inner">
-      <h1 class="title">Healthy Recipe Collection</h1>
+      <h1 id="page-title" class="title">Healthy Recipe Collection</h1>
       <p class="subtitle">
         Discover nutritious, delicious recipes designed to support your health journey. Every recipe
         includes detailed nutritional information and dietary labels.
@@ -17,25 +17,34 @@
   </section>
 
   <!-- Filter bar -->
-  <section class="filters-wrap">
-    <div class="filters">
+  <section class="filters-wrap" aria-label="Recipe filters">
+    <div class="filters" role="search">
       <!-- Search -->
       <div class="search-box">
-        <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <label for="recipe-search" class="sr-only">Search recipes</label>
+        <svg class="search-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none" />
           <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2" />
         </svg>
         <input
+          id="recipe-search"
           v-model="q"
           class="input-ghost"
+          type="search"
           placeholder="Search recipes..."
-          aria-label="Search recipes"
+          aria-label="Search recipes by name or ingredient"
         />
       </div>
 
       <!-- Category -->
       <div class="select-wrap">
-        <select id="category" v-model="category" class="select">
+        <label for="category" class="sr-only">Filter by category</label>
+        <select
+          id="category"
+          v-model="category"
+          class="select"
+          aria-label="Filter recipes by category"
+        >
           <option value="">All Categories</option>
           <option value="breakfast">Breakfast</option>
           <option value="lunch">Lunch</option>
@@ -47,7 +56,13 @@
 
       <!-- Diet -->
       <div class="select-wrap">
-        <select id="diet" v-model="diet" class="select">
+        <label for="diet" class="sr-only">Filter by diet</label>
+        <select
+          id="diet"
+          v-model="diet"
+          class="select"
+          aria-label="Filter recipes by dietary preference"
+        >
           <option value="">All Diets</option>
           <option value="vegetarian">Vegetarian</option>
           <option value="vegan">Vegan</option>
@@ -58,20 +73,26 @@
       </div>
     </div>
 
-    <p class="result-count">Showing {{ filtered.length }} recipes</p>
+    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
+      Showing {{ filtered.length }} {{ filtered.length === 1 ? 'recipe' : 'recipes' }}
+    </p>
   </section>
 
   <!-- Recipe Card grid -->
-  <section class="grid-wrap">
-    <div class="cards">
-      <RecipeCard 
-        v-for="r in filtered" 
-        :key="r.id" 
-        :recipe="r" 
+  <section class="grid-wrap" aria-label="Recipe results">
+    <div class="cards" role="list">
+      <RecipeCard
+        v-for="r in filtered"
+        :key="r.id"
+        :recipe="r"
+        role="listitem"
         @edit-recipe="handleEditRecipe"
         @delete-recipe="handleDeleteRecipe"
       />
     </div>
+    <p v-if="filtered.length === 0" class="no-results" role="status">
+      No recipes found. Try adjusting your filters.
+    </p>
   </section>
 </template>
 
@@ -126,7 +147,7 @@ function handleEditRecipe(recipe) {
 
 function handleDeleteRecipe(recipe) {
   if (!confirm(`Are you sure you want to delete "${recipe.title}"?`)) return
-  
+
   // Find and remove recipe from data
   const index = data.findIndex(r => r.id === recipe.id)
   if (index !== -1) {
@@ -135,6 +156,17 @@ function handleDeleteRecipe(recipe) {
   }
 }
 </script>
+
+<style scoped>
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 48px 24px;
+  color: #6b7280;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+}
+</style>
 
 <style scoped>
 :host,

@@ -10,6 +10,7 @@ import { useAuthStore } from './stores/auth.js'
 // Global styles
 import './assets/base.css'
 import './assets/main.css'
+import './assets/accessibility.css' // WCAG 2.1 AA accessibility styles
 // Bootstrap utility classes (optional; added for convenience in some pages)
 import 'bootstrap/dist/css/bootstrap.min.css'
 

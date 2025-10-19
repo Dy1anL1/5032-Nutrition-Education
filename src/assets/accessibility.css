@@ -1,0 +1,216 @@
+/**
+ * Global Accessibility Styles for WCAG 2.1 AA Compliance
+ * This file contains reusable accessibility-focused CSS
+ */
+
+/* Skip to main content link (for keyboard users) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #16a34a; /* Darker green for better contrast */
+  color: #ffffff;
+  padding: 12px 24px;
+  text-decoration: none;
+  z-index: 100;
+  font-weight: 700;
+  border-radius: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Enhanced focus indicators - WCAG 2.1 AA requires visible focus */
+*:focus-visible {
+  outline: 3px solid #22c55e;
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #22c55e;
+  outline-offset: 2px;
+}
+
+/* Remove default outline but keep focus-visible */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Required field indicator */
+.required-indicator {
+  color: #dc2626;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Error messages - ensure they're announced by screen readers */
+.form-errors,
+[role="alert"] {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* Success messages */
+.toast-ok,
+[role="status"] {
+  color: #22c55e;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* Invalid input styling */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+  border-width: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+
+  *:focus-visible {
+    outline-width: 4px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Keyboard navigation improvements */
+button,
+a,
+input,
+select,
+textarea {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Ensure clickable elements have adequate size (WCAG 2.5.5) */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* For smaller interactive elements, ensure adequate padding/spacing */
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 24px;
+  min-width: 24px;
+}
+
+/* Improve link visibility */
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #1d4ed8;
+}
+
+a:visited {
+  color: #7c3aed;
+}
+
+/* Loading state accessibility */
+[aria-busy="true"] {
+  cursor: wait;
+}
+
+/* Ensure proper heading hierarchy is visible */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Color contrast improvements */
+.muted,
+.text-muted {
+  color: #4b5563; /* Darker gray for WCAG AA 4.5:1+ contrast ratio on white background */
+}
+
+/* Form labels */
+label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Ensure sufficient color contrast for disabled elements */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border-color: #d1d5db;
+}

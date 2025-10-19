@@ -91,7 +91,7 @@ header {
 .subtitle {
   max-width: 900px;
   margin: 0 auto;
-  color: #696d6e;
+  color: #4b5563; /* Darker for WCAG AA contrast */
   font-size: 20px;
   margin-bottom: 10px;
 }

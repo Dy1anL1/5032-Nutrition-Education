@@ -7,16 +7,27 @@
 -->
 <template>
   <div class="app">
+    <!-- Skip to main content link for keyboard accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <NavBar />
-    <main class="container">
+
+    <main id="main-content" class="container" role="main" tabindex="-1">
       <!-- Show loading spinner during initial auth -->
-      <div v-if="authStore.loading && showInitialLoader" class="initial-loader">
-        <div class="loader-spinner"></div>
+      <div
+        v-if="authStore.loading && showInitialLoader"
+        class="initial-loader"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading application"
+      >
+        <div class="loader-spinner" aria-hidden="true"></div>
         <p>Loading...</p>
       </div>
       <!-- Main content -->
       <router-view v-else />
     </main>
+
     <FooterBar />
   </div>
 </template>
