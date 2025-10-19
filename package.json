@@ -16,7 +16,6 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
-    "firebase": "^12.2.1",
     "jspdf": "^3.0.3",
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.15.0",
@@ -33,6 +32,7 @@
     "@vue/eslint-config-prettier": "^10.2.0",
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "~10.3.0",
+    "firebase": "^12.4.0",
     "globals": "^16.3.0",
     "prettier": "3.6.2",
     "vite": "^7.0.6",

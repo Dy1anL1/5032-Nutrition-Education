@@ -16,6 +16,20 @@
     </div>
   </section>
 
+  <!-- Cache Status Info (Offline Feature) -->
+  <section v-if="cacheInfo" class="cache-info-banner">
+    <div class="cache-info-content">
+      <span class="cache-icon">&#128190;</span>
+      <div class="cache-text">
+        <strong>Offline Mode Active</strong>
+        <p>{{ filtered.length }} recipes cached for offline viewing &bull; Last updated {{ cacheAgeText }}</p>
+      </div>
+      <button @click="clearRecipeCache" class="clear-cache-btn" title="Clear cached recipes">
+        Clear Cache
+      </button>
+    </div>
+  </section>
+
   <!-- Filter bar -->
   <section class="filters-wrap" aria-label="Recipe filters">
     <div class="filters" role="search">
@@ -103,10 +117,11 @@
 
 <script setup>
 // Local state used for filtering
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import data from '../data/recipes.json'
 import Papa from 'papaparse'
+import { saveToCache, loadFromCache, clearCache, getCacheInfo, CACHE_KEYS, isOnline } from '../services/offlineService'
 
 // Query string for free-text search (matches title and ingredients)
 const q = ref('')
@@ -114,6 +129,53 @@ const q = ref('')
 // Category and diet selectors - match against recipe fields and tags
 const category = ref('')
 const diet = ref('')
+
+// Cache info for offline feature display
+const cacheInfo = ref(null)
+
+// Computed property for cache age text
+const cacheAgeText = computed(() => {
+  if (!cacheInfo.value) return ''
+  const minutes = cacheInfo.value.ageMinutes
+  if (minutes < 60) return `${minutes} minutes ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} hours ago`
+  const days = Math.floor(hours / 24)
+  return `${days} days ago`
+})
+
+// Function to clear recipe cache
+function clearRecipeCache() {
+  if (confirm('Clear cached recipes? You will need an internet connection to view recipes again.')) {
+    clearCache(CACHE_KEYS.RECIPES)
+    cacheInfo.value = null
+    alert('Cache cleared successfully!')
+  }
+}
+
+// Cache recipes data on mount
+onMounted(() => {
+  // Check if we're offline and try to load from cache first
+  if (!isOnline()) {
+    console.log('[Recipes] Offline mode - attempting to load from cache')
+    const cachedData = loadFromCache(CACHE_KEYS.RECIPES)
+    if (cachedData) {
+      console.log('[Recipes] Loaded', cachedData.length, 'recipes from cache')
+    } else {
+      console.warn('[Recipes] No cached data available')
+    }
+  }
+
+  // Save recipes to cache for offline access (online or offline)
+  saveToCache(CACHE_KEYS.RECIPES, data, 168) // Cache for 7 days
+  console.log('[Recipes] Cached', data.length, 'recipes for offline use')
+
+  // Get cache info to display to user
+  const info = getCacheInfo(CACHE_KEYS.RECIPES)
+  if (info && !isOnline()) {
+    cacheInfo.value = info
+  }
+})
 
 // `filtered` - computed list derived from the data file and the three controls above.
 // Keeps filtering logic local and easy to test.
@@ -206,6 +268,87 @@ function exportToCSV() {
   color: #6b7280;
   font-size: 1.1rem;
   grid-column: 1 / -1;
+}
+
+/* Cache info banner */
+.cache-info-banner {
+  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: var(--page-max);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.cache-info-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.cache-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.cache-text {
+  flex: 1;
+}
+
+.cache-text strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #1e40af;
+}
+
+.cache-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #3730a3;
+}
+
+.clear-cache-btn {
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.clear-cache-btn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .cache-info-content {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .cache-icon {
+    font-size: 1.5rem;
+  }
+
+  .cache-text strong {
+    font-size: 0.9rem;
+  }
+
+  .cache-text p {
+    font-size: 0.85rem;
+  }
+
+  .clear-cache-btn {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+  }
 }
 </style>
 

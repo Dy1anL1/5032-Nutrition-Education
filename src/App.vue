@@ -10,6 +10,9 @@
     <!-- Skip to main content link for keyboard accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <!-- Offline indicator -->
+    <OfflineIndicator />
+
     <NavBar />
 
     <main id="main-content" class="container" role="main" tabindex="-1">
@@ -36,6 +39,7 @@
 import { ref, onMounted } from 'vue'
 import NavBar from './components/NavBar.vue'
 import FooterBar from './components/FooterBar.vue'
+import OfflineIndicator from './components/OfflineIndicator.vue'
 import { useAuthStore } from './stores/auth'
 
 const authStore = useAuthStore()
