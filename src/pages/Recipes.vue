@@ -73,9 +73,14 @@
       </div>
     </div>
 
-    <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
-      Showing {{ filtered.length }} {{ filtered.length === 1 ? 'recipe' : 'recipes' }}
-    </p>
+    <div class="results-bar">
+      <p class="result-count" role="status" aria-live="polite" aria-atomic="true">
+        Showing {{ filtered.length }} {{ filtered.length === 1 ? 'recipe' : 'recipes' }}
+      </p>
+      <button @click="exportToCSV" class="export-btn" title="Export all recipes to CSV">
+        Export to CSV
+      </button>
+    </div>
   </section>
 
   <!-- Recipe Card grid -->
@@ -101,6 +106,7 @@
 import { ref, computed } from 'vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import data from '../data/recipes.json'
+import Papa from 'papaparse'
 
 // Query string for free-text search (matches title and ingredients)
 const q = ref('')
@@ -154,6 +160,41 @@ function handleDeleteRecipe(recipe) {
     data.splice(index, 1)
     alert(`Recipe "${recipe.title}" deleted successfully!`)
   }
+}
+
+// Export to CSV
+function exportToCSV() {
+  // Prepare data for CSV export
+  const csvData = data.map((recipe) => ({
+    ID: recipe.id,
+    Title: recipe.title,
+    Category: recipe.category || recipe.meal || '',
+    'Diet Type': recipe.diet || (recipe.tags ? recipe.tags.join('; ') : ''),
+    'Calories (kcal)': recipe.nutrition?.kcal || 0,
+    'Protein (g)': recipe.nutrition?.protein || 0,
+    'Carbs (g)': recipe.nutrition?.carbs || 0,
+    'Fat (g)': recipe.nutrition?.fat || 0,
+    'Fiber (g)': recipe.nutrition?.fiber || 0,
+    'Prep Time': recipe.prepTime || '',
+    Summary: recipe.summary || '',
+    Ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients.join('; ') : '',
+  }))
+
+  // Convert to CSV
+  const csv = Papa.unparse(csvData)
+
+  // Create download link
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+
+  link.setAttribute('href', url)
+  link.setAttribute('download', `recipes-export-${new Date().toISOString().split('T')[0]}.csv`)
+  link.style.visibility = 'hidden'
+
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 </script>
 
@@ -297,10 +338,32 @@ function handleDeleteRecipe(recipe) {
   pointer-events: none;
 }
 
-/* Result count */
-.result-count {
+/* Results bar */
+.results-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 14px 2px 6px;
+}
+
+.result-count {
   color: #6a7483;
+}
+
+.export-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.export-btn:hover {
+  background: #059669;
 }
 
 /* ========= Card Grid Area ========= */

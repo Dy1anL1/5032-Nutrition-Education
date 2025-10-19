@@ -44,7 +44,12 @@
 
     <!-- User Management - Interactive Table 1 -->
     <section class="management-section">
-      <h2>User Management</h2>
+      <div class="section-header">
+        <h2>User Management</h2>
+        <button @click="exportUsersToCSV" class="export-btn" title="Export users to CSV">
+          Export Users to CSV
+        </button>
+      </div>
       <Vue3EasyDataTable
         :headers="userHeaders"
         :items="filteredUsers"
@@ -213,6 +218,7 @@ import recipesData from '../data/recipes.json'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import EmailTestModal from '../components/EmailTestModal.vue'
+import Papa from 'papaparse'
 
 const authStore = useAuthStore()
 
@@ -420,6 +426,40 @@ function getStarDisplay(rating) {
   const emptyStar = '\u2606'
   return filledStar.repeat(rating) + emptyStar.repeat(5 - rating)
 }
+
+// Export users to CSV
+function exportUsersToCSV() {
+  if (users.value.length === 0) {
+    alert('No users to export.')
+    return
+  }
+
+  // Prepare user data for CSV
+  const csvData = users.value.map((user) => ({
+    ID: user.id,
+    Email: user.email,
+    'Display Name': user.displayName || user.name || '',
+    Role: user.role || 'user',
+    'Created Date': formatDate(user.createdAt),
+    'Email Verified': user.emailVerified ? 'Yes' : 'No',
+  }))
+
+  // Convert to CSV
+  const csv = Papa.unparse(csvData)
+
+  // Create download link
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+
+  link.setAttribute('href', url)
+  link.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`)
+  link.style.visibility = 'hidden'
+
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <style scoped>
@@ -475,10 +515,33 @@ function getStarDisplay(rating) {
   margin-bottom: 48px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .management-section h2 {
   font-size: 1.8rem;
-  margin-bottom: 24px;
+  margin: 0;
   color: #1a202c;
+}
+
+.export-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.export-btn:hover {
+  background: #059669;
 }
 
 .users-table {
@@ -666,10 +729,10 @@ function getStarDisplay(rating) {
 }
 
 .column-filter {
-  padding: 6px 8px;
+  padding: 8px 12px;
   border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: 6px;
+  font-size: 14px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -749,5 +812,46 @@ function getStarDisplay(rating) {
     display: block;
     margin-bottom: 8px;
   }
+}
+
+/* Increase font size for vue3-easy-data-table */
+:deep(.vue3-easy-data-table__main) {
+  font-size: 14px;
+}
+
+:deep(.vue3-easy-data-table__footer) {
+  font-size: 14px;
+}
+
+:deep(.vue3-easy-data-table__body td) {
+  font-size: 14px;
+  padding: 12px 10px;
+}
+
+:deep(.vue3-easy-data-table__header th) {
+  font-size: 14px;
+  padding: 12px 10px;
+}
+
+:deep(.vue3-easy-data-table__message) {
+  font-size: 15px;
+  padding: 40px 20px;
+}
+
+:deep(.rows-per-page-selector) {
+  font-size: 14px;
+}
+
+:deep(.pagination__rows-per-page) {
+  font-size: 14px;
+}
+
+:deep(.pagination__items-index) {
+  font-size: 14px;
+}
+
+/* Add spacing between sections */
+.management-section:not(:last-child) {
+  margin-bottom: 60px;
 }
 </style>

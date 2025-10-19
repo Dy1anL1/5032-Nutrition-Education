@@ -14,6 +14,9 @@
           <button @click="previousPlan" class="nav-btn">&lt;</button>
           <h2>{{ planDisplay }}</h2>
           <button @click="nextPlan" class="nav-btn">&gt;</button>
+          <button @click="exportToPDF" class="export-btn" title="Export meal plan to PDF">
+            Export to PDF
+          </button>
         </div>
 
         <div class="meal-grid">
@@ -124,6 +127,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import recipes from '../data/recipes.json'
+import { jsPDF } from 'jspdf'
 
 const weekdays = ['Day 1', 'Day 2', 'Day 3']
 const meals = ['Breakfast', 'Lunch', 'Dinner']
@@ -239,6 +243,126 @@ const clearShoppingList = () => {
 const formatTag = (tag) => {
   return tag.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
 }
+
+// Export to PDF
+const exportToPDF = () => {
+  const weekKey = currentWeekStart.value.toISOString().split('T')[0]
+  const currentPlan = weekPlan.value[weekKey]
+
+  if (!currentPlan || Object.keys(currentPlan).length === 0) {
+    alert('No meals planned for this period. Please add some meals first.')
+    return
+  }
+
+  const doc = new jsPDF()
+
+  // Title
+  doc.setFontSize(20)
+  doc.setFont(undefined, 'bold')
+  doc.text('3-Day Meal Plan', 105, 20, { align: 'center' })
+
+  // Date range
+  doc.setFontSize(12)
+  doc.setFont(undefined, 'normal')
+  doc.text(planDisplay.value, 105, 30, { align: 'center' })
+
+  let yPos = 45
+
+  // For each day
+  weekdays.forEach((day) => {
+    if (yPos > 250) {
+      doc.addPage()
+      yPos = 20
+    }
+
+    // Day header
+    doc.setFontSize(16)
+    doc.setFont(undefined, 'bold')
+    doc.text(day, 20, yPos)
+    yPos += 10
+
+    // For each meal
+    meals.forEach((meal) => {
+      const recipe = getMealForDay(day, meal)
+
+      if (recipe) {
+        if (yPos > 260) {
+          doc.addPage()
+          yPos = 20
+        }
+
+        doc.setFontSize(12)
+        doc.setFont(undefined, 'bold')
+        doc.text(`${meal}:`, 25, yPos)
+
+        doc.setFont(undefined, 'normal')
+        doc.text(recipe.title, 25, yPos + 6)
+
+        // Nutrition info
+        const nutrition = `${recipe.nutrition.kcal} kcal | Protein: ${recipe.nutrition.protein}g | Carbs: ${recipe.nutrition.carbs}g | Fat: ${recipe.nutrition.fat}g`
+        doc.setFontSize(10)
+        doc.text(nutrition, 25, yPos + 12)
+
+        yPos += 20
+      }
+    })
+
+    yPos += 5
+  })
+
+  // Total nutrition summary
+  if (yPos > 230) {
+    doc.addPage()
+    yPos = 20
+  }
+
+  yPos += 10
+  doc.setFontSize(14)
+  doc.setFont(undefined, 'bold')
+  doc.text('Nutritional Summary', 20, yPos)
+  yPos += 8
+
+  let totalCalories = 0
+  let totalProtein = 0
+  let totalCarbs = 0
+  let totalFat = 0
+  let mealCount = 0
+
+  weekdays.forEach((day) => {
+    meals.forEach((meal) => {
+      const recipe = getMealForDay(day, meal)
+      if (recipe) {
+        totalCalories += recipe.nutrition.kcal || 0
+        totalProtein += recipe.nutrition.protein || 0
+        totalCarbs += recipe.nutrition.carbs || 0
+        totalFat += recipe.nutrition.fat || 0
+        mealCount++
+      }
+    })
+  })
+
+  doc.setFontSize(11)
+  doc.setFont(undefined, 'normal')
+  doc.text(`Total Meals: ${mealCount}`, 25, yPos)
+  yPos += 6
+  doc.text(`Total Calories: ${totalCalories} kcal`, 25, yPos)
+  yPos += 6
+  doc.text(`Total Protein: ${totalProtein}g`, 25, yPos)
+  yPos += 6
+  doc.text(`Total Carbs: ${totalCarbs}g`, 25, yPos)
+  yPos += 6
+  doc.text(`Total Fat: ${totalFat}g`, 25, yPos)
+  yPos += 6
+  doc.text(
+    `Average Calories per Meal: ${mealCount > 0 ? Math.round(totalCalories / mealCount) : 0} kcal`,
+    25,
+    yPos,
+  )
+
+  // Save the PDF
+  const fileName = `meal-plan-${weekKey}.pdf`
+  doc.save(fileName)
+}
 </script>
 
 <style scoped>
@@ -289,6 +413,23 @@ const formatTag = (tag) => {
   background: #16a34a;
 }
 
+.export-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-left: 8px;
+}
+
+.export-btn:hover {
+  background: #2563eb;
+}
+
 .meal-grid {
   background: white;
   border-radius: 12px;
@@ -332,7 +473,7 @@ const formatTag = (tag) => {
 }
 
 .meal-slot {
-  min-height: 120px;
+  min-height: 240px;
   border-right: 1px solid #e2e8f0;
   cursor: pointer;
   position: relative;
@@ -366,22 +507,24 @@ const formatTag = (tag) => {
 
 .meal-image {
   width: 100%;
-  height: 60px;
+  height: 180px;
   object-fit: cover;
   border-radius: 4px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .meal-info h4 {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.2;
-  margin-bottom: 2px;
+  font-size: 18px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .meal-calories {
-  font-size: 10px;
+  font-size: 16px;
   color: #64748b;
+  font-weight: 500;
 }
 
 .remove-btn {
@@ -524,6 +667,7 @@ const formatTag = (tag) => {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+  margin-top: 20px;
 }
 
 .generate-btn,
