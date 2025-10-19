@@ -153,14 +153,21 @@ cd 5032-Nutrition-Education
 npm install
 ```
 
-3. **Configure Firebase** (create `.env.local` with your Firebase config as shown above)
+3. **Install Cloud Functions dependencies**:
+```bash
+cd functions
+npm install
+cd ..
+```
 
-4. **Start development server**:
+4. **Configure Firebase** (create `.env.local` with your Firebase config as shown above)
+
+5. **Start development server**:
 ```bash
 npm run dev
 ```
 
-5. **Open application**: Navigate to http://localhost:5173
+6. **Open application**: Navigate to http://localhost:5173
 
 ### **Available Scripts**
 ```bash
@@ -304,6 +311,102 @@ This application uses SendGrid API for email functionality including contact for
 - **Welcome Email**: Automatic email when users register
 - **Test Email with Attachment**: Admin dashboard feature for testing PDF attachments
 - **Bulk Email**: Admin can send emails to multiple users (F requirement)
+
+---
+
+## Nutrition Statistics Cloud Function (E.1)
+
+This application includes a Firebase Cloud Function that calculates comprehensive nutrition statistics for meal plans.
+
+### Overview
+
+The `calculateNutritionStats` function is a callable Cloud Function that processes meal plan data and returns detailed nutritional analysis including totals, averages, and percentages of daily recommended values.
+
+### Features
+
+- **Total Nutrition**: Sum of all nutrients across selected meals
+- **Average Per Meal**: Calculated average nutrition values
+- **Daily Percentages**: Comparison against standard 2000 calorie diet recommendations
+- **Real-time Calculation**: Server-side processing for accurate results
+- **Authentication Required**: Secure access for logged-in users only
+
+### Implementation Details
+
+**Cloud Function Location**: [functions/index.js:182-246](functions/index.js#L182-L246)
+
+**Frontend Integration**: [src/pages/MealPlanner.vue:252-297](src/pages/MealPlanner.vue#L252-L297)
+
+**Function Parameters**:
+```javascript
+{
+  recipes: [
+    {
+      nutrition: {
+        kcal: 320,      // or calories
+        protein: 15,
+        carbs: 45,
+        fat: 8
+      }
+    }
+  ]
+}
+```
+
+**Return Data Structure**:
+```javascript
+{
+  success: true,
+  data: {
+    total: {
+      calories: 2840,
+      protein: 138,
+      carbs: 392,
+      fat: 112
+    },
+    average: {
+      calories: 315,
+      protein: 15,
+      carbs: 43,
+      fat: 12
+    },
+    percentages: {
+      calories: 142,  // % of 2000 kcal
+      protein: 276,   // % of 50g
+      carbs: 131,     // % of 300g
+      fat: 160        // % of 70g
+    },
+    recipesAnalyzed: 9,
+    timestamp: "2025-10-19T08:33:38.000Z"
+  }
+}
+```
+
+### Daily Recommended Values (Based on 2000 calorie diet)
+
+- Calories: 2000 kcal
+- Protein: 50g
+- Carbohydrates: 300g
+- Fat: 70g
+
+### Usage in Application
+
+1. **Navigate to Meal Planner**: Add recipes to your 3-day meal plan
+2. **Add Multiple Meals**: Select at least 3-5 meals across different days
+3. **Click "Calculate Nutrition"**: Purple button in the navigation area
+4. **View Results**: Modal displays comprehensive nutrition analysis
+
+### Technical Features
+
+- **Callable Function**: Uses Firebase HTTPS callable pattern with authentication
+- **Field Compatibility**: Supports both `calories` and `kcal` field names
+- **Error Handling**: Validates input and provides meaningful error messages
+- **Performance**: Server-side calculation for consistent results
+
+### Files
+
+- [functions/index.js](functions/index.js) - Cloud Function implementation
+- [src/pages/MealPlanner.vue](src/pages/MealPlanner.vue) - UI and frontend integration
+- [functions/package.json](functions/package.json) - Dependencies
 
 ---
 
