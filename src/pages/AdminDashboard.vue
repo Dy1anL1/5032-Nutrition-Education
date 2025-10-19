@@ -582,20 +582,47 @@ async function loadData() {
       createdAt: doc.data().createdAt?.toDate() || new Date(),
     }))
 
-    // Load recipes from local data (since they're not in Firestore)
-    recipes.value = recipesData
+    // Load recipes from local data and add rating stats
+    const ratingsStatsSnapshot = await getDocs(collection(db, 'ratings'))
+    const ratingsStatsMap = {}
+    ratingsStatsSnapshot.docs.forEach(doc => {
+      const data = doc.data()
+      ratingsStatsMap[doc.id] = {
+        averageRating: data.totalRatings > 0 ? (data.totalScore / data.totalRatings).toFixed(1) : 0,
+        ratingCount: data.totalRatings || 0
+      }
+    })
 
-    // Load all ratings with full details
-    const allRatingsSnapshot = await getDocs(collection(db, 'ratings'))
+    // Combine recipes with rating stats
+    recipes.value = recipesData.map(recipe => ({
+      ...recipe,
+      averageRating: ratingsStatsMap[recipe.id]?.averageRating || 0,
+      ratingCount: ratingsStatsMap[recipe.id]?.ratingCount || 0
+    }))
+
+    // Load all ratings from userRatings collection
+    const allRatingsSnapshot = await getDocs(collection(db, 'userRatings'))
+
+    // Create a map to look up recipe names and user names
+    const recipeMap = {}
+    recipesData.forEach(recipe => {
+      recipeMap[recipe.id] = recipe.title
+    })
+
+    const userMap = {}
+    usersSnapshot.docs.forEach(doc => {
+      userMap[doc.id] = doc.data().name || doc.data().email
+    })
+
     allRatings.value = allRatingsSnapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
-        recipeName: data.recipeName || 'Unknown Recipe',
-        userName: data.userName || 'Anonymous',
+        recipeName: recipeMap[data.itemId] || 'Unknown Recipe',
+        userName: userMap[data.userId] || 'Anonymous',
         rating: data.rating || 0,
         comment: data.comment || '',
-        createdAt: data.createdAt?.toDate() || new Date(),
+        createdAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
       }
     })
 
@@ -655,7 +682,7 @@ async function deleteRatingById(ratingId) {
   if (!confirm('Are you sure you want to delete this rating?')) return
 
   try {
-    await deleteDoc(doc(db, 'ratings', ratingId))
+    await deleteDoc(doc(db, 'userRatings', ratingId))
     allRatings.value = allRatings.value.filter((r) => r.id !== ratingId)
     ratings.value = allRatings.value
     alert('Rating deleted successfully')
